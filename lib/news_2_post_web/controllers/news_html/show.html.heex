@@ -1,0 +1,17 @@
+<.header>
+  News <%= @news.id %>
+  <:subtitle>This is a news record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/news/#{@news}/edit"}>
+      <.button>Edit news</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title"><%= @news.title %></:item>
+  <:item title="Preamble"><%= @news.preamble %></:item>
+  <:item title="Sections"><%= @news.sections %></:item>
+</.list>
+
+<.back navigate={~p"/news"}>Back to news</.back>
