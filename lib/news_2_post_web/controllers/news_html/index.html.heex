@@ -11,15 +11,10 @@
   <:col :let={news} label="ID"><%= news.id %></:col>
   <:col :let={news} label="Title"><%= news.title %></:col>
   <:col :let={news} label="Preamble"><%= news.preamble %></:col>
+  <:col :let={news} label="Status"><%= news.status %></:col>
   <:action :let={news}>
     <div class="sr-only">
       <.link navigate={~p"/news/#{news}"}>Show</.link>
     </div>
-    <.link navigate={~p"/news/#{news}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={news}>
-    <.link href={~p"/news/#{news}"} method="delete" data-confirm="Are you sure?">
-      Delete
-    </.link>
   </:action>
 </.table>
