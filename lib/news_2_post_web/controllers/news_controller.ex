@@ -28,7 +28,9 @@ defmodule News2PostWeb.NewsController do
 
   def show(conn, %{"id" => id}) do
     news = CRUD.get_news!(id)
-    render(conn, :show, news: news)
+    sections = JSON.decode!(news.sections)
+
+    render(conn, :show, news: news, sections: sections)
   end
 
   def edit(conn, %{"id" => id}) do
