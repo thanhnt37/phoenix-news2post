@@ -14,7 +14,7 @@ defmodule News2Post.CRUD.News do
   @doc false
   def changeset(news, attrs) do
     news
-    |> cast(attrs, [:title, :preamble, :sections])
+    |> cast(attrs, [:title, :preamble, :sections, :status])
     |> validate_required([:title, :preamble, :sections])
   end
 end

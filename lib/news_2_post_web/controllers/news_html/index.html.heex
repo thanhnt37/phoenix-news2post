@@ -11,7 +11,15 @@
   <:col :let={news} label="ID"><%= news.id %></:col>
   <:col :let={news} label="Title"><%= news.title %></:col>
   <:col :let={news} label="Preamble"><%= news.preamble %></:col>
-  <:col :let={news} label="Status"><%= news.status %></:col>
+
+  <:col :let={news} label="Status">
+    <%= if news.status == "approved" do %>
+      <span class="text-lime-600"><%= news.status %></span>
+    <% else %>
+      <span><%= news.status %></span>
+    <% end %>
+  </:col>
+
   <:action :let={news}>
     <div class="sr-only">
       <.link navigate={~p"/news/#{news}"}>Show</.link>

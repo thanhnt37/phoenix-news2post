@@ -64,6 +64,7 @@ defmodule News2PostWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     resources "/news", NewsController
+    get "/news/:id/approve", NewsController, :approve
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update

@@ -1,12 +1,18 @@
 <.header>
   News ID: <%= @news.id %>
-  <:subtitle>Status: <%= @news.status %></:subtitle>
+  <:subtitle>Status:
+      <%= if @news.status == "approved" do %>
+        <span class="text-lime-600"><%= @news.status %></span>
+      <% else %>
+        <span><%= @news.status %></span>
+      <% end %>
+  </:subtitle>
   <:actions>
     <%= if @news.status == "reviewing" do %>
       <.link href={~p"/news/#{@news}/edit"}>
         <.button class="bg-yellow-600 mr-2">Edit news</.button>
       </.link>
-      <.link href={~p"/news/#{@news}/edit"}>
+      <.link href={~p"/news/#{@news}/approve?_tk=#{get_csrf_token()}"}>
         <.button class="bg-green-600">Approve</.button>
       </.link>
     <% end %>

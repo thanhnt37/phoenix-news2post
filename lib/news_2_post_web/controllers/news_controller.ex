@@ -14,6 +14,24 @@ defmodule News2PostWeb.NewsController do
     render(conn, :new, changeset: changeset)
   end
 
+  def approve(conn, params) do
+    status = %{
+      "status" => "approved"
+    }
+    IO.puts("status: #{inspect(status, pretty: true)}")
+
+    news = CRUD.get_news!(params["id"])
+    case CRUD.update_news(news, status) do
+      {:ok, _news} ->
+        conn
+        |> put_flash(:info, "News Approved successfully.")
+        |> redirect(to: ~p"/news")
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, :edit, news: news, changeset: changeset)
+    end
+  end
+
   def create(conn, %{"news" => news_params}) do
     case CRUD.create_news(news_params) do
       {:ok, news} ->
