@@ -46,7 +46,11 @@ defmodule News2PostWeb.NewsController do
 
   def show(conn, %{"id" => id}) do
     news = CRUD.get_news!(id)
+    IO.inspect(news.sections)
+    IO.puts("news.sections: #{inspect(news.sections, pretty: true)}")
+
     sections = JSON.decode!(news.sections)
+    IO.puts("sections: #{inspect(sections, pretty: true)}")
 
     render(conn, :show, news: news, sections: sections)
   end
@@ -54,13 +58,23 @@ defmodule News2PostWeb.NewsController do
   def edit(conn, %{"id" => id}) do
     news = CRUD.get_news!(id)
     changeset = CRUD.change_news(news)
-    render(conn, :edit, news: news, changeset: changeset)
+    sections = JSON.decode!(news.sections)
+    IO.puts("sections: #{inspect(sections, pretty: true)}")
+
+    render(conn, :edit, news: news, changeset: changeset, sections: sections)
   end
 
   def update(conn, %{"id" => id, "news" => news_params}) do
     news = CRUD.get_news!(id)
 
-    case CRUD.update_news(news, news_params) do
+    sections = Map.values(news_params["sections"])
+    sections = JSON.encode!(sections)
+
+    updated_data = %{news_params | "sections" => sections}
+    IO.puts("updated_data: #{inspect(updated_data, pretty: true)}")
+    IO.inspect("is_map updated_data: #{is_map(updated_data)}")
+
+    case CRUD.update_news(news, updated_data) do
       {:ok, news} ->
         conn
         |> put_flash(:info, "News updated successfully.")
