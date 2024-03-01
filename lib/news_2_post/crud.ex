@@ -18,7 +18,11 @@ defmodule News2Post.CRUD do
 
   """
   def list_news do
-    Repo.all(News)
+    News
+#      |> where([i], i.status == "approved")
+      |> order_by([i], desc: i.status)
+      |> order_by([i], desc: i.id)
+      |> Repo.all()
   end
 
   @doc """

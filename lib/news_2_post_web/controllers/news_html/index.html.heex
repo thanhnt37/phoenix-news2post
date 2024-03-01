@@ -1,10 +1,5 @@
 <.header>
   Listing News
-  <:actions>
-    <.link href={~p"/news/new"}>
-      <.button>New News</.button>
-    </.link>
-  </:actions>
 </.header>
 
 <.table id="news" rows={@news_collection} row_click={&JS.navigate(~p"/news/#{&1}")}>
