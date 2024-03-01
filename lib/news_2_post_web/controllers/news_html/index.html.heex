@@ -2,6 +2,14 @@
   Listing News
 </.header>
 
+<form action="/news" method="get" id="filterForm">
+  <select name="status" onchange="document.getElementById('filterForm').submit()" class="mt-2 block w-48 rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm">
+    <option value="all" selected={@status == "all"}>All</option>
+    <option value="reviewing" selected={@status == "reviewing"}>Reviewing</option>
+    <option value="approved" selected={@status == "approved"}>Approved</option>
+  </select>
+</form>
+
 <.table id="news" rows={@news_collection} row_click={&JS.navigate(~p"/news/#{&1}")}>
   <:col :let={news} label="ID"><%= news.id %></:col>
   <:col :let={news} label="Title"><%= news.title %></:col>
