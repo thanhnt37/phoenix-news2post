@@ -20,7 +20,7 @@ defmodule News2PostWeb.Router do
   scope "/", News2PostWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    get "/", NewsController, :index
   end
 
   # Other scopes may use custom stacks.
