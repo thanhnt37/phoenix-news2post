@@ -3,7 +3,7 @@
 
   <.simple_form for={@conn.params["user"]} as={:user} action={~p"/users/confirm/#{@token}"}>
     <:actions>
-      <.button class="w-full">Confirm my account</.button>
+      <.button class="w-full bg-zinc-900">Confirm my account</.button>
     </:actions>
   </.simple_form>
 

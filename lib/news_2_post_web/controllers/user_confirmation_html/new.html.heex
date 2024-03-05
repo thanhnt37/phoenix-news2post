@@ -7,7 +7,7 @@
   <.simple_form :let={f} for={@conn.params["user"]} as={:user} action={~p"/users/confirm"}>
     <.input field={f[:email]} type="email" placeholder="Email" required />
     <:actions>
-      <.button phx-disable-with="Sending..." class="w-full">
+      <.button phx-disable-with="Sending..." class="w-full bg-zinc-900">
         Resend confirmation instructions
       </.button>
     </:actions>
