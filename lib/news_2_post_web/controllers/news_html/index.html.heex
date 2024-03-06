@@ -12,7 +12,10 @@
 
 <.table id="news" rows={@news_collection} row_click={&JS.navigate(~p"/news/#{&1}")}>
   <:col :let={news} label="ID"><%= news.id %></:col>
-  <:col :let={news} label="Title"><%= news.title %></:col>
+  <:col :let={news} label="Source">
+    <span style="display:block; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.url %></span>
+  </:col>
+  <:col :let={news} label="Title" class="w-80"><%= news.title %></:col>
   <:col :let={news} label="Preamble"><%= news.preamble %></:col>
 
   <:col :let={news} label="Status">

@@ -7,6 +7,13 @@
   <input name="_method" type="hidden" hidden="" value="put">
   <input name="_csrf_token" type="hidden" hidden="" value={get_csrf_token()}>
 
+  <div class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
+    <dt class="w-10 flex-none text-zinc-500">Source:</dt>
+    <dd class="text-zinc-700">
+      <a href={@news.url} target="_blank"><%= @news.url %></a>
+    </dd>
+  </div>
+
   <div phx-feedback-for="news[title]" class="mt-5">
     <label for="news_title" class="block text-sm font-semibold leading-6 text-zinc-800">Title</label>
     <input type="text" name="news[title]" id="news_title" value={@news.title} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">

@@ -20,6 +20,13 @@
 </.header>
 
 <.list>
+  <:item title="Source">
+      <%= if @news.url != nil do %>
+        <a href={@news.url} target="_blank"><%= @news.url %></a>
+      <% else %>
+        Unknown
+      <% end %>
+  </:item>
   <:item title="Title"><%= @news.title %></:item>
   <:item title="Preamble"><%= @news.preamble %></:item>
   <:item title="Sections">

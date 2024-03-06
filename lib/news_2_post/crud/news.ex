@@ -7,6 +7,7 @@ defmodule News2Post.CRUD.News do
     field :preamble, :string
     field :sections, :string
     field :status, :string
+    field :url, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -14,7 +15,7 @@ defmodule News2Post.CRUD.News do
   @doc false
   def changeset(news, attrs) do
     news
-    |> cast(attrs, [:title, :preamble, :sections, :status])
+    |> cast(attrs, [:title, :preamble, :sections, :status, :url])
     |> validate_required([:title, :preamble, :sections])
   end
 end
