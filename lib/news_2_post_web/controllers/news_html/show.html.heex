@@ -15,6 +15,9 @@
       <.link href={~p"/news/#{@news}/approve?_tk=#{get_csrf_token()}"}>
         <.button class="bg-green-600">Approve</.button>
       </.link>
+      <.link href={~p"/news/#{@news}"} method="delete" data-confirm="Are you sure?">
+        <.button class="bg-red-600">Delete</.button>
+      </.link>
     <% end %>
   </:actions>
 </.header>
