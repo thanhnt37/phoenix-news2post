@@ -1,0 +1,115 @@
+<div class="dashboard-index">
+    <div class="flex justify-between">
+        <div class="bg-cyan-600 w-fit rounded-[25px] p-8 aspect">
+            <p class="m-0  tracking-widest font-bold text-2xl">11th of March</p>
+            <table class="mt-3">
+                <tbody>
+                <tr>
+                    <td class="w-20 text-slate-700">Today:</td>
+                    <td class="m-0 tracking-widest text-lg">13 items</td>
+                </tr>
+                <tr>
+                    <td class="w-20 text-slate-700">Month:</td>
+                    <td class="m-0 tracking-widest text-lg">148 items</td>
+                </tr>
+                <tr>
+                    <td class="w-20 text-slate-700">Quarter:</td>
+                    <td class="m-0 tracking-widest text-lg">657 items</td>
+                </tr>
+                <tr>
+                    <td class="w-20 text-slate-700">Year:</td>
+                    <td class="m-0 tracking-widest text-lg">1220 items</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-cyan-600 w-fit rounded-[25px] p-8 aspect">
+            <p class="m-0  tracking-widest font-bold text-2xl">Number of re-written</p>
+            <table class="mt-3">
+                <tbody>
+                <tr>
+                    <td class="w-20 text-slate-700">Today:</td>
+                    <td class="m-0 tracking-widest text-lg">0 items</td>
+                </tr>
+                <tr>
+                    <td class="w-20 text-slate-700">Month:</td>
+                    <td class="m-0 tracking-widest text-lg">15 items</td>
+                </tr>
+                <tr>
+                    <td class="w-20 text-slate-700">Quarter:</td>
+                    <td class="m-0 tracking-widest text-lg">123 items</td>
+                </tr>
+                <tr>
+                    <td class="w-20 text-slate-700">Year:</td>
+                    <td class="m-0 tracking-widest text-lg">221 items</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-cyan-600 w-fit rounded-[25px] p-8 aspect">
+            <p class="m-0 tracking-widest font-bold text-2xl">Latest re-written</p>
+            <table class="mt-3 ">
+                <tbody>
+                <tr>
+                    <td class="">
+                        <a href="/news/1" class="text-slate-700 hover:text-black whitespace-nowrap w-52 block overflow-hidden leading-7" style="text-overflow: ellipsis;">
+                            Svenskarna har bristande kunskaper om trafikregler
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="">
+                        <a href="/news/1" class="text-slate-700 hover:text-black whitespace-nowrap w-52 block overflow-hidden leading-7" style="text-overflow: ellipsis;">
+                            3bits Blueprint Kundportal - en kundunik och modern kundportal till ett fast pris
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="">
+                        <a href="/news/1" class="text-slate-700 hover:text-black whitespace-nowrap w-52 block overflow-hidden leading-7" style="text-overflow: ellipsis;">
+                            PriorNilsson Idea utmärkt som Sveriges bästa hedgefond 2023
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="">
+                        <a href="/news/1" class="text-slate-700 hover:text-black whitespace-nowrap w-52 block overflow-hidden leading-7" style="text-overflow: ellipsis;">
+                            Led företaget genom lågkonjunktur med automation
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-10">
+        <.table id="news" rows={@news_collection}>
+            <:col :let={news} label="ID"><%= news.id %></:col>
+            <:col :let={news} label="Source">
+                <span style="display:block; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.url %></span>
+            </:col>
+            <:col :let={news} label="Title" class="w-80"><%= news.title %></:col>
+
+            <:col :let={news} label="Actions">
+                <%= if news.status == "approved" do %>
+                    <.link href="#" method="put" data-confirm="Are you confirm to publish this News?">
+                        <span class="w-24 block text-center bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Publish</span>
+                    </.link>
+                <% else %>
+                    <%= if news.status == "reviewing" do %>
+                        <.link href="#" method="put" data-confirm="Are you sure to approve this News?">
+                            <span class="w-24 block text-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Approve</span>
+                        </.link>
+                    <% else %>
+                        <.link href="#" method="put" data-confirm="Are you sure to re-write this News?">
+                            <span class="w-24 block text-center min-w-fit bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Re-write</span>
+                        </.link>
+                    <% end %>
+                <% end %>
+            </:col>
+        </.table>
+    </div>
+</div>

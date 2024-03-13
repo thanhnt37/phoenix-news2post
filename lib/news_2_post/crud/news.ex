@@ -6,7 +6,7 @@ defmodule News2Post.CRUD.News do
     field :title, :string
     field :preamble, :string
     field :sections, :string
-    field :status, :string
+    field :status, :string  # raw || reviewing || approved || published
     field :url, :string
 
     timestamps(type: :utc_datetime)

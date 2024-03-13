@@ -31,6 +31,12 @@ defmodule News2Post.CRUD do
       |> Repo.all()
   end
 
+  def all_news() do
+    News
+      |> order_by([i], desc: i.id)
+      |> Repo.all()
+  end
+
   @doc """
   Gets a single news.
 
