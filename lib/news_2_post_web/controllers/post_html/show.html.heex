@@ -1,0 +1,45 @@
+<.header>
+  Post ID: <%= @post.id %>
+  <:subtitle>Status:
+    <%= if @post.status == "approved" do %>
+      <span class="text-lime-600"><%= @post.status %></span>
+    <% else %>
+      <span><%= @post.status %></span>
+    <% end %>
+  </:subtitle>
+  <:actions>
+    <%= if @post.status == "reviewing" do %>
+      <.link href={~p"/posts/#{@post}/edit"}>
+        <.button class="bg-yellow-600 mr-2">Edit post</.button>
+      </.link>
+      <.link href={~p"/posts/#{@post}/approve?_tk=#{get_csrf_token()}"}>
+        <.button class="bg-green-600">Approve</.button>
+      </.link>
+      <.link href={~p"/posts/#{@post}"} method="delete" data-confirm="Are you sure?">
+        <.button class="bg-red-600">Delete</.button>
+      </.link>
+    <% end %>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Source">
+    <%= if @post.url != nil do %>
+      <a href={@post.url} target="_blank"><%= @post.url %></a>
+    <% else %>
+      Unknown
+    <% end %>
+  </:item>
+  <:item title="Title"><%= @post.title %></:item>
+  <:item title="Preamble"><%= @post.preamble %></:item>
+  <:item title="Sections">
+    <%= for section <- @sections do %>
+      <div class="mb-8">
+        <h6 class="font-bold"><%= section["heading"] %></h6>
+        <p><%= section["text"] %></p>
+      </div>
+    <% end %>
+  </:item>
+</.list>
+
+<.back navigate={~p"/posts"}>Back to posts</.back>

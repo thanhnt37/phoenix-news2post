@@ -66,6 +66,9 @@ defmodule News2PostWeb.Router do
     resources "/news", NewsController
     get "/news/:id/approve", NewsController, :approve
 
+    resources "/posts", PostController
+    get "/posts/:id/approve", PostController, :approve
+
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email

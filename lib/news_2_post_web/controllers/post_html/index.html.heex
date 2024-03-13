@@ -1,0 +1,35 @@
+<.header>
+  Listing Posts
+</.header>
+
+<form action="/posts" method="get" id="filterForm">
+  <select name="status" onchange="document.getElementById('filterForm').submit()" class="mt-2 block w-48 rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm">
+    <option value="all" selected={@status == "all"}>All</option>
+    <option value="reviewing" selected={@status == "reviewing"}>Reviewing</option>
+    <option value="approved" selected={@status == "approved"}>Approved</option>
+  </select>
+</form>
+
+<.table id="posts" rows={@posts} row_click={&JS.navigate(~p"/posts/#{&1}")}>
+  <:col :let={post} label="ID"><%= post.id %></:col>
+  <:col :let={post} label="Source">
+    <span style="display:block; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= post.url %></span>
+  </:col>
+  <:col :let={post} label="Title" class="w-80"><%= post.title %></:col>
+  <:col :let={post} label="Preamble"><%= post.preamble %></:col>
+
+  <:col :let={post} label="Status">
+    <%= if post.status == "approved" do %>
+      <span class="text-lime-600"><%= post.status %></span>
+    <% else %>
+      <span><%= post.status %></span>
+    <% end %>
+  </:col>
+
+  <:action :let={post}>
+    <div class="sr-only">
+      <.link navigate={~p"/posts/#{post}"}>Show</.link>
+    </div>
+  </:action>
+</.table>
+

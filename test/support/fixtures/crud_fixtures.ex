@@ -19,4 +19,22 @@ defmodule News2Post.CRUDFixtures do
 
     news
   end
+
+  @doc """
+  Generate a post.
+  """
+  def post_fixture(attrs \\ %{}) do
+    {:ok, post} =
+      attrs
+      |> Enum.into(%{
+        preamble: "some preamble",
+        sections: "some sections",
+        status: "some status",
+        title: "some title",
+        url: "some url"
+      })
+      |> News2Post.CRUD.create_post()
+
+    post
+  end
 end

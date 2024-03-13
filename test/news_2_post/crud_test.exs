@@ -60,4 +60,66 @@ defmodule News2Post.CRUDTest do
       assert %Ecto.Changeset{} = CRUD.change_news(news)
     end
   end
+
+  describe "posts" do
+    alias News2Post.CRUD.Post
+
+    import News2Post.CRUDFixtures
+
+    @invalid_attrs %{status: nil, title: nil, url: nil, preamble: nil, sections: nil}
+
+    test "list_posts/0 returns all posts" do
+      post = post_fixture()
+      assert CRUD.list_posts() == [post]
+    end
+
+    test "get_post!/1 returns the post with given id" do
+      post = post_fixture()
+      assert CRUD.get_post!(post.id) == post
+    end
+
+    test "create_post/1 with valid data creates a post" do
+      valid_attrs = %{status: "some status", title: "some title", url: "some url", preamble: "some preamble", sections: "some sections"}
+
+      assert {:ok, %Post{} = post} = CRUD.create_post(valid_attrs)
+      assert post.status == "some status"
+      assert post.title == "some title"
+      assert post.url == "some url"
+      assert post.preamble == "some preamble"
+      assert post.sections == "some sections"
+    end
+
+    test "create_post/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = CRUD.create_post(@invalid_attrs)
+    end
+
+    test "update_post/2 with valid data updates the post" do
+      post = post_fixture()
+      update_attrs = %{status: "some updated status", title: "some updated title", url: "some updated url", preamble: "some updated preamble", sections: "some updated sections"}
+
+      assert {:ok, %Post{} = post} = CRUD.update_post(post, update_attrs)
+      assert post.status == "some updated status"
+      assert post.title == "some updated title"
+      assert post.url == "some updated url"
+      assert post.preamble == "some updated preamble"
+      assert post.sections == "some updated sections"
+    end
+
+    test "update_post/2 with invalid data returns error changeset" do
+      post = post_fixture()
+      assert {:error, %Ecto.Changeset{}} = CRUD.update_post(post, @invalid_attrs)
+      assert post == CRUD.get_post!(post.id)
+    end
+
+    test "delete_post/1 deletes the post" do
+      post = post_fixture()
+      assert {:ok, %Post{}} = CRUD.delete_post(post)
+      assert_raise Ecto.NoResultsError, fn -> CRUD.get_post!(post.id) end
+    end
+
+    test "change_post/1 returns a post changeset" do
+      post = post_fixture()
+      assert %Ecto.Changeset{} = CRUD.change_post(post)
+    end
+  end
 end
