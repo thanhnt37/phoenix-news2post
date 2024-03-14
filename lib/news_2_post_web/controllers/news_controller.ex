@@ -5,14 +5,15 @@ defmodule News2PostWeb.NewsController do
   alias News2Post.CRUD.News
 
   def index(conn, _params) do
-    status = Map.get(conn.params, "status", "all");
-    news = CRUD.list_news(status)
-    render(conn, :index, news_collection: news, status: status)
+    news = CRUD.list_news()
+    render(conn, :index, news_collection: news)
   end
 
   def new(conn, _params) do
     changeset = CRUD.change_news(%News{})
     render(conn, :new, changeset: changeset)
+
+
   end
 
   def approve(conn, params) do

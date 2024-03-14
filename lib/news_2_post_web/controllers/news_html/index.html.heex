@@ -2,33 +2,16 @@
   Listing News
 </.header>
 
-<form action="/news" method="get" id="filterForm">
-  <select name="status" onchange="document.getElementById('filterForm').submit()" class="mt-2 block w-48 rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm">
-    <option value="all" selected={@status == "all"}>All</option>
-    <option value="reviewing" selected={@status == "reviewing"}>Reviewing</option>
-    <option value="approved" selected={@status == "approved"}>Approved</option>
-  </select>
-</form>
-
-<.table id="news" rows={@news_collection} row_click={&JS.navigate(~p"/news/#{&1}")}>
+<.table id="news" rows={@news_collection}>
   <:col :let={news} label="ID"><%= news.id %></:col>
-  <:col :let={news} label="Source">
-    <span style="display:block; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.url %></span>
-  </:col>
   <:col :let={news} label="Title" class="w-80"><%= news.title %></:col>
-  <:col :let={news} label="Preamble"><%= news.preamble %></:col>
-
-  <:col :let={news} label="Status">
-    <%= if news.status == "approved" do %>
-      <span class="text-lime-600"><%= news.status %></span>
-    <% else %>
-      <span><%= news.status %></span>
-    <% end %>
+  <:col :let={news} label="Description">
+    <span style="display:block; width: 370px; height: 70px; overflow: hidden; text-overflow: ellipsis;"><%= news.description %></span>
   </:col>
-
-  <:action :let={news}>
-    <div class="sr-only">
-      <.link navigate={~p"/news/#{news}"}>Show</.link>
-    </div>
-  </:action>
+  <:col :let={news} label="Source">
+    <span style="display:block; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><a href={news.url} target="_blank"><%= news.url %></a></span>
+  </:col>
+  <:col :let={news} label="Published At">
+    <span style="display:block; width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.published_at %></span>
+  </:col>
 </.table>

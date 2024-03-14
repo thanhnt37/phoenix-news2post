@@ -4,10 +4,9 @@ defmodule News2Post.CRUD.News do
 
   schema "news" do
     field :title, :string
-    field :preamble, :string
-    field :sections, :string
-    field :status, :string  # raw || reviewing || approved || published
+    field :description, :string
     field :url, :string
+    field :published_at, :date
 
     timestamps(type: :utc_datetime)
   end
@@ -15,7 +14,7 @@ defmodule News2Post.CRUD.News do
   @doc false
   def changeset(news, attrs) do
     news
-    |> cast(attrs, [:title, :preamble, :sections, :status, :url])
-    |> validate_required([:title, :preamble, :sections])
+    |> cast(attrs, [:title, :description, :url, :published_at])
+    |> validate_required([:title, :description, :url])
   end
 end
