@@ -3,9 +3,14 @@ defmodule News2PostWeb.NewsController do
 
   alias News2Post.CRUD
   alias News2Post.CRUD.News
+  alias ExAws.Dynamo
 
   def index(conn, _params) do
-    news = CRUD.list_news()
+    table_name = "news2post_dev_News"
+    news = all_news(table_name)
+#    news = CRUD.list_news()
+
+    IO.inspect(news)
     render(conn, :index, news_collection: news)
   end
 
@@ -94,5 +99,16 @@ defmodule News2PostWeb.NewsController do
     conn
     |> put_flash(:info, "News deleted successfully.")
     |> redirect(to: ~p"/news")
+  end
+
+  def all_news(table_name) do
+    Dynamo.query(
+      table_name, limit: 5,
+      expression_attribute_values: [raw: "raw"],
+      expression_attribute_names: %{"#status" => "status"},
+      key_condition_expression: "#status = :raw"
+    )
+    |> ExAws.request!
+    |> Dynamo.decode_item(as: News)
   end
 end

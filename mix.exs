@@ -52,7 +52,9 @@ defmodule News2Post.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
-      {:json, "~> 1.4"}
+      {:json, "~> 1.4"},
+      {:ex_aws_dynamo, "~> 4.0"},
+      {:hackney, "~> 1.9"}
     ]
   end
 
