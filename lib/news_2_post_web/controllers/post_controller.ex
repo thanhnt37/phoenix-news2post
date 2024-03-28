@@ -11,7 +11,7 @@ defmodule News2PostWeb.PostController do
     status = Map.get(conn.params, "status", "all");
 #    posts = CRUD.list_posts(status)
 
-    posts = all_posts_v2(table_name)
+    posts = all_posts_v2(table_name, status)
 #    IO.inspect(posts)
 
     render(conn, :index, posts: posts, status: status)
@@ -145,11 +145,23 @@ defmodule News2PostWeb.PostController do
     |> redirect(to: ~p"/posts")
   end
 
-  def all_posts_v2(table_name) do
-    Dynamo.scan(
-      table_name,
-      limit: 5,
-    )
+  def all_posts_v2(table_name, status \\ "all") do
+    opts =
+      if status != "all" do
+        %{
+          limit: 50,
+          expression_attribute_values: [status: status],
+          expression_attribute_names: %{"#status" => "status"},
+          filter_expression: "#status = :status"
+        }
+      else
+        %{
+          limit: 50
+        }
+      end
+    IO.inspect(opts)
+
+    Dynamo.scan(table_name, opts)
     |> ExAws.request!
     |> Dynamo.decode_item(as: Post)
   end
