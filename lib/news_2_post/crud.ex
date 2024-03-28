@@ -1,224 +1,122 @@
 defmodule News2Post.CRUD do
-  @moduledoc """
-  The CRUD context.
-  """
-
   import Ecto.Query, warn: false
+  alias ExAws.Dynamo
   alias News2Post.Repo
 
   alias News2Post.CRUD.News
-
-  @doc """
-  Returns the list of news.
-
-  ## Examples
-
-      iex> list_news()
-      [%News{}, ...]
-
-  """
-  def list_news() do
-    News
-      |> order_by([i], desc: i.id)
-      |> Repo.all()
-  end
-
-  def all_news() do
-    News
-      |> order_by([i], desc: i.id)
-      |> Repo.all()
-  end
-
-  @doc """
-  Gets a single news.
-
-  Raises `Ecto.NoResultsError` if the News does not exist.
-
-  ## Examples
-
-      iex> get_news!(123)
-      %News{}
-
-      iex> get_news!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_news!(id), do: Repo.get!(News, id)
-
-  @doc """
-  Creates a news.
-
-  ## Examples
-
-      iex> create_news(%{field: value})
-      {:ok, %News{}}
-
-      iex> create_news(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_news(attrs \\ %{}) do
-    %News{}
-    |> News.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a news.
-
-  ## Examples
-
-      iex> update_news(news, %{field: new_value})
-      {:ok, %News{}}
-
-      iex> update_news(news, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_news(%News{} = news, attrs) do
-    news
-    |> News.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a news.
-
-  ## Examples
-
-      iex> delete_news(news)
-      {:ok, %News{}}
-
-      iex> delete_news(news)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_news(%News{} = news) do
-    Repo.delete(news)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking news changes.
-
-  ## Examples
-
-      iex> change_news(news)
-      %Ecto.Changeset{data: %News{}}
-
-  """
-  def change_news(%News{} = news, attrs \\ %{}) do
-    News.changeset(news, attrs)
-  end
-
   alias News2Post.CRUD.Post
 
-  @doc """
-  Returns the list of posts.
+  @news_table_name "news2post_dev_News_v2"
+  @posts_table_name "news2post_dev_Posts_v2"
 
-  ## Examples
-
-      iex> list_posts()
-      [%Post{}, ...]
-
-  """
-  def list_posts(status) do
-    news_query =
-      if status == "all" do
-        Post
+  def all_posts(status \\ "all") do
+    opts =
+      if status != "all" do
+        %{
+          limit: 50,
+          expression_attribute_values: [status: status],
+          expression_attribute_names: %{"#status" => "status"},
+          filter_expression: "#status = :status"
+        }
       else
-        Post |> where([i], i.status == ^status)
+        %{
+          limit: 50
+        }
       end
+    IO.inspect(opts)
 
-    news_query
-    |> order_by([i], desc: i.status)
-    |> order_by([i], desc: i.id)
-    |> Repo.all()
+    Dynamo.scan(@posts_table_name, opts)
+    |> ExAws.request!
+    |> Dynamo.decode_item(as: Post)
   end
 
-  def all_posts() do
-    Post
-    |> order_by([i], desc: i.id)
-    |> Repo.all()
+  def get_post_by_id(id) do
+    result = Dynamo.query(
+               @posts_table_name,
+               expression_attribute_values: [id: id],
+               expression_attribute_names: %{"#id" => "id"},
+               key_condition_expression: "#id = :id"
+             )
+             |> ExAws.request!
+             |> Dynamo.decode_item(as: Post)
+
+    Enum.at(result, 0)
   end
 
-  @doc """
-  Gets a single post.
-
-  Raises `Ecto.NoResultsError` if the Post does not exist.
-
-  ## Examples
-
-      iex> get_post!(123)
-      %Post{}
-
-      iex> get_post!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_post!(id), do: Repo.get!(Post, id)
-
-  @doc """
-  Creates a post.
-
-  ## Examples
-
-      iex> create_post(%{field: value})
-      {:ok, %Post{}}
-
-      iex> create_post(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_post(attrs \\ %{}) do
-    %Post{}
-    |> Post.changeset(attrs)
-    |> Repo.insert()
+  def delete_post(id, created_at) do
+    Dynamo.delete_item(
+      @posts_table_name,
+      %{id: id, created_at: created_at}
+    )
+    |> ExAws.request!
   end
 
-  @doc """
-  Updates a post.
+  # ## Parameters
+  #
+  # - `id`: String
+  # - `created_at`: String
+  # - `updated_data`: Map
+  #   + `title`: String (Optional)
+  #   + `description`: String (Optional)
+  #   + `sections`: String (Optional)
+  #
+  # ## Example
+  #     iex> PostCRUD.update_post("123", "2022-01-01T00:00:00Z", %{title: "New Title", description: "New Description"})
+  def update_post(id, created_at, updated_data) do
+    update_expression = build_update_expression(updated_data)
 
-  ## Examples
+    expression_attribute_names = build_expression_attribute_names(updated_data)
 
-      iex> update_post(post, %{field: new_value})
-      {:ok, %Post{}}
+    expression_attribute_values = build_expression_attribute_values(updated_data)
 
-      iex> update_post(post, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+    primary_key = %{id: id, created_at: created_at}
 
-  """
-  def update_post(%Post{} = post, attrs) do
-    post
-    |> Post.changeset(attrs)
-    |> Repo.update()
+    update_item_params = %{
+      update_expression: update_expression,
+      expression_attribute_names: expression_attribute_names,
+      expression_attribute_values: expression_attribute_values,
+      return_values: :updated_new
+    }
+
+    IO.puts("..... update_item_params: #{inspect(update_item_params, pretty: true)}")
+
+    Dynamo.update_item(@posts_table_name, primary_key, update_item_params)
+    |> ExAws.request!()
   end
 
-  @doc """
-  Deletes a post.
+#  --------------------- PRIVATE ---------------------
 
-  ## Examples
+  defp build_update_expression(updated_data) do
+    expressions =
+      Enum.map(
+        updated_data,
+        fn {key, _} -> "##{key} = :#{key}" end
+      )
 
-      iex> delete_post(post)
-      {:ok, %Post{}}
+    update_expression =
+      Enum.join(expressions, ", ")
 
-      iex> delete_post(post)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_post(%Post{} = post) do
-    Repo.delete(post)
+    "SET #{update_expression}"
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking post changes.
+  defp build_expression_attribute_names(updated_data) do
+    attribute_names =
+      Enum.map(
+        updated_data,
+        fn {key, _} -> {"##{key}", key} end
+      )
 
-  ## Examples
-
-      iex> change_post(post)
-      %Ecto.Changeset{data: %Post{}}
-
-  """
-  def change_post(%Post{} = post, attrs \\ %{}) do
-    Post.changeset(post, attrs)
+    Map.new(attribute_names)
   end
+
+  defp build_expression_attribute_values(updated_data) do
+    Enum.reduce(
+      updated_data,
+      %{},
+      fn {key, value}, acc ->
+        Map.put(acc, :"#{key}", value)
+      end
+    )
+  end
+
 end
