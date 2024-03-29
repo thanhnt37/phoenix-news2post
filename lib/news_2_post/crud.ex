@@ -9,6 +9,26 @@ defmodule News2Post.CRUD do
   @news_table_name "news2post_dev_News_v2"
   @posts_table_name "news2post_dev_Posts_v2"
 
+#  --------------------- News ---------------------
+
+  def all_news() do
+    Dynamo.scan(
+      @news_table_name
+    )
+    |> ExAws.request!
+    |> Dynamo.decode_item(as: News)
+  end
+
+  def get_news(limit \\ 10) do
+    Dynamo.scan(
+      @news_table_name,
+      limit: limit
+    )
+    |> ExAws.request!
+    |> Dynamo.decode_item(as: News)
+  end
+
+#  --------------------- Posts ---------------------
   def all_posts(status \\ "all") do
     opts =
       if status != "all" do
@@ -19,9 +39,26 @@ defmodule News2Post.CRUD do
           filter_expression: "#status = :status"
         }
       else
+        %{ limit: 50 }
+      end
+    IO.inspect(opts)
+
+    Dynamo.scan(@posts_table_name, opts)
+    |> ExAws.request!
+    |> Dynamo.decode_item(as: Post)
+  end
+
+  def get_posts(status \\ "all", limit \\ 10) do
+    opts =
+      if status != "all" do
         %{
-          limit: 50
+          limit: limit,
+          expression_attribute_values: [status: status],
+          expression_attribute_names: %{"#status" => "status"},
+          filter_expression: "#status = :status"
         }
+      else
+        %{ limit: limit }
       end
     IO.inspect(opts)
 
