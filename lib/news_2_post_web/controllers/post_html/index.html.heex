@@ -32,9 +32,6 @@
 
 <.table id="posts" rows={@posts} row_click={&JS.navigate(~p"/posts/#{&1}")}>
   <:col :let={post} label="ID"><%= post.id %></:col>
-  <:col :let={post} label="Source">
-    <span style="display:block; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= post.url %></span>
-  </:col>
   <:col :let={post} label="Title" class="w-80"><%= post.title %></:col>
   <:col :let={post} label="Description"><%= post.description %></:col>
 

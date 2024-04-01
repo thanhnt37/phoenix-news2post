@@ -20,7 +20,6 @@ defmodule News2PostWeb.Router do
   scope "/", News2PostWeb do
     pipe_through :browser
 
-    get "/", DashboardController, :index
   end
 
   # Other scopes may use custom stacks.
@@ -63,10 +62,16 @@ defmodule News2PostWeb.Router do
   scope "/", News2PostWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    resources "/news", NewsController
-    get "/news/:id/approve", NewsController, :approve
+    get "/", DashboardController, :index
 
-    resources "/posts", PostController
+    get "/news", NewsController, :index
+
+    get "/posts", PostController, :index
+    get "/posts/:id", PostController, :show
+    get "/posts/:id/edit", PostController, :edit
+    patch "/posts/:id", PostController, :update
+    put "/posts/:id", PostController, :update
+    delete "/posts/:id", PostController, :delete
     get "/posts/:id/approve", PostController, :approve
 
     get "/users/settings", UserSettingsController, :edit

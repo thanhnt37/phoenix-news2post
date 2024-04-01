@@ -28,10 +28,12 @@
   <:col :let={news} label="Description">
     <span style="display:block; width: 370px; height: 70px; overflow: hidden; text-overflow: ellipsis;"><%= news.description %></span>
   </:col>
-  <:col :let={news} label="Source">
-    <span style="display:block; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><a href={news.url} target="_blank"><%= news.url %></a></span>
-  </:col>
   <:col :let={news} label="Published At">
     <span style="display:block; width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.published_at %></span>
+  </:col>
+  <:col :let={news} label="Actions">
+    <span style="display:block; width: 85px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="text-lime-600">
+      <a href={news.url} target="_blank">View Source</a>
+    </span>
   </:col>
 </.table>
