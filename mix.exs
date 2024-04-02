@@ -54,7 +54,8 @@ defmodule News2Post.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:json, "~> 1.4"},
       {:ex_aws_dynamo, "~> 4.0"},
-      {:hackney, "~> 1.9"}
+      {:hackney, "~> 1.9"},
+      { :uuid, "~> 1.1" }
     ]
   end
 

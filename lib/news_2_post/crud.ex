@@ -47,6 +47,13 @@ defmodule News2Post.CRUD do
     |> ExAws.request!
     |> Dynamo.decode_item(as: Post)
   end
+  
+  def create_post(attr) do
+    IO.inspect(attr)
+
+    Dynamo.put_item(@posts_table_name, attr)
+    |> ExAws.request!
+  end
 
   def get_posts(status \\ "all", limit \\ 10) do
     opts =

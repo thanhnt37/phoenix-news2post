@@ -12,10 +12,10 @@ defmodule News2Post.CRUD.Post do
     timestamps(type: :utc_datetime, inserted_at: :created_at, updated_at: :updated_at)
   end
 
-  @doc false
-  def changeset(post, attrs) do
+  def changeset(post, attrs \\ %{}) do
     post
     |> cast(attrs, [:title, :description, :sections, :status, :url])
-    |> validate_required([:title, :description, :sections])
+    |> validate_required([:title, :description, :sections, :url])
   end
+
 end

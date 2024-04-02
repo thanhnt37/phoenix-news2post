@@ -23,9 +23,13 @@ defmodule News2PostWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", News2PostWeb do
-  #   pipe_through :api
-  # end
+   scope "/api", News2PostWeb do
+     pipe_through :api
+
+     get "/v1/posts", ApiController, :get_posts
+     post "/v1/posts", ApiController, :create_post
+     get "/v1/posts/:id", ApiController, :show_post
+   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:news_2_post, :dev_routes) do
