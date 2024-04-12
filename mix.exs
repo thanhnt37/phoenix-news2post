@@ -55,7 +55,8 @@ defmodule News2Post.MixProject do
       {:json, "~> 1.4"},
       {:ex_aws_dynamo, "~> 4.0"},
       {:hackney, "~> 1.9"},
-      { :uuid, "~> 1.1" }
+      { :uuid, "~> 1.1" },
+      {:ex_oauth2_provider, "~> 0.5.7"}
     ]
   end
 

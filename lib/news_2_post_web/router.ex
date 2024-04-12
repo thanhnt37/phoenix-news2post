@@ -22,6 +22,10 @@ defmodule News2PostWeb.Router do
 
   end
 
+  scope "/oauth", News2PostWeb do
+    post "/token", OAuthController, :create
+  end
+
   # Other scopes may use custom stacks.
    scope "/api", News2PostWeb do
      pipe_through :api
