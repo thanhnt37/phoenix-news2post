@@ -15,6 +15,8 @@ defmodule News2PostWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug ExOauth2Provider.Plug.VerifyHeader, otp_app: :news_2_post, realm: "Bearer"
+    plug ExOauth2Provider.Plug.EnsureAuthenticated, typ: "access"
   end
 
   scope "/", News2PostWeb do
@@ -23,7 +25,7 @@ defmodule News2PostWeb.Router do
   end
 
   scope "/oauth", News2PostWeb do
-    post "/token", OAuthController, :create
+    post "/token", OAuthController, :grant_token
   end
 
   # Other scopes may use custom stacks.
