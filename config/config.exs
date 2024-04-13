@@ -67,15 +67,6 @@ import_config "#{config_env()}.exs"
 
 config :news_2_post, ExOauth2Provider,
   repo: News2Post.Repo,
-#  resource_owner: News2Post.Accounts.User,
-#  default_scopes: ~w(public),
-#  optional_scopes: ~w(write update),
-#  native_redirect_uri: "urn:ietf:wg:oauth:2.0:oob",
-#  use_refresh_token: false,
-#  revoke_refresh_token_on_use: false,
-#  force_ssl_in_redirect_uri: true,
   grant_flows: ~w(client_credentials),
-#  password_auth: nil,
-#  access_token_response_body_handler: nil,
-#  authorization_code_expires_in: 600,
-  access_token_expires_in: 7200
+  access_token_expires_in: 7200,
+  signature: "aaea1a32f3e6a0c23896293ebbdf66ce64848ae886857d40d0a1a644221c73be"
