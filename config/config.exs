@@ -64,3 +64,9 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+
+config :news_2_post, ExOauth2Provider,
+  repo: News2Post.Repo,
+  grant_flows: ~w(client_credentials),
+  access_token_expires_in: 7200,
+  signature: "aaea1a32f3e6a0c23896293ebbdf66ce64848ae886857d40d0a1a644221c73be"

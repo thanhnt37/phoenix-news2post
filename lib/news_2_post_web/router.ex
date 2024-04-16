@@ -17,14 +17,29 @@ defmodule News2PostWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated_api do
+    plug ExOauth2Provider.Plug.VerifyHeader, otp_app: :news_2_post, realm: "Bearer"
+    plug ExOauth2Provider.Plug.EnsureAuthenticated, typ: "access"
+  end
+
   scope "/", News2PostWeb do
     pipe_through :browser
 
   end
 
+  scope "/oauth", News2PostWeb do
+    pipe_through :api
+    post "/token", OAuthController, :grant_token
+  end
+
+  scope "/oauth", News2PostWeb do
+    pipe_through [:api, :authenticated_api]
+    post "/app", OAuthController, :create_application
+  end
+
   # Other scopes may use custom stacks.
    scope "/api", News2PostWeb do
-     pipe_through :api
+     pipe_through [:api, :authenticated_api]
 
      get "/v1/posts", ApiController, :get_posts
      post "/v1/posts", ApiController, :create_post
