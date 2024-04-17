@@ -28,6 +28,34 @@ defmodule News2Post.CRUD do
     |> Dynamo.decode_item(as: News)
   end
 
+  def create_news(attr) do
+    IO.inspect(attr)
+
+    Dynamo.put_item(@news_table_name, attr)
+    |> ExAws.request!
+  end
+
+  def get_news_by_id(id) do
+    records = Dynamo.query(
+               @news_table_name,
+               expression_attribute_values: [id: id],
+               expression_attribute_names: %{"#id" => "id"},
+               key_condition_expression: "#id = :id"
+             )
+             |> ExAws.request!
+             |> Dynamo.decode_item(as: News)
+
+    Enum.at(records, 0)
+  end
+
+  def delete_news(id, created_at) do
+    Dynamo.delete_item(
+      @news_table_name,
+      %{id: id, created_at: created_at}
+    )
+    |> ExAws.request!
+  end
+
 #  --------------------- Posts ---------------------
   def all_posts(status \\ "all") do
     opts =
@@ -75,7 +103,7 @@ defmodule News2Post.CRUD do
   end
 
   def get_post_by_id(id) do
-    result = Dynamo.query(
+    records = Dynamo.query(
                @posts_table_name,
                expression_attribute_values: [id: id],
                expression_attribute_names: %{"#id" => "id"},
@@ -84,7 +112,7 @@ defmodule News2Post.CRUD do
              |> ExAws.request!
              |> Dynamo.decode_item(as: Post)
 
-    Enum.at(result, 0)
+    Enum.at(records, 0)
   end
 
   def delete_post(id, created_at) do

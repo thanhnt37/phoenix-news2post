@@ -8,7 +8,7 @@ defmodule News2PostWeb.ApiController do
   def get_posts(conn, _params) do
     posts = CRUD.all_posts()
 
-    render(conn, :index, posts: posts)
+    render(conn, :get_posts, posts: posts)
   end
 
   def create_post(conn, params) do
@@ -31,7 +31,7 @@ defmodule News2PostWeb.ApiController do
       post = CRUD.get_post_by_id(post_id)
       IO.puts("..... post: #{inspect(post, pretty: true)}")
 
-      render(conn, :show, post: post)
+      render(conn, :show_post, post: post)
     else
       IO.inspect(JSON.encode(changeset.errors))
 
@@ -41,7 +41,45 @@ defmodule News2PostWeb.ApiController do
 
   def show_post(conn, %{"id" => id}) do
     post = CRUD.get_post_by_id(id)
-    render(conn, :show, post: post)
+    render(conn, :show_post, post: post)
+  end
+
+  def get_news(conn, _params) do
+    news = CRUD.all_news()
+
+    render(conn, :get_news, news: news)
+  end
+
+  def create_news(conn, params) do
+    changeset = News.changeset(%News{}, params)
+    if changeset.valid? do
+      news_id = UUID.uuid1()
+      record = %{
+        "id": news_id,
+        "title": params["title"],
+        "description": params["description"],
+        "url": params["url"],
+        "status": "raw",
+        "published_at": params["published_at"],
+        "created_at": DateTime.to_string(DateTime.utc_now()),
+      }
+      IO.puts("..... record: #{inspect(record, pretty: true)}")
+
+      CRUD.create_news(record)
+      news = CRUD.get_news_by_id(news_id)
+      IO.puts("..... news: #{inspect(news, pretty: true)}")
+
+      render(conn, :show_news, news: news)
+    else
+      IO.inspect(JSON.encode(changeset.errors))
+
+      render(conn, :response, %{code: 406, message: "Not Acceptable!", data: JSON.encode!(changeset.errors)})
+    end
+  end
+
+  def show_news(conn, %{"id" => id}) do
+    news = CRUD.get_news_by_id(id)
+    render(conn, :show_news, news: news)
   end
 
 end

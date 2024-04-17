@@ -44,6 +44,10 @@ defmodule News2PostWeb.Router do
      get "/v1/posts", ApiController, :get_posts
      post "/v1/posts", ApiController, :create_post
      get "/v1/posts/:id", ApiController, :show_post
+
+     get "/v1/news", ApiController, :get_news
+     post "/v1/news", ApiController, :create_news
+     get "/v1/news/:id", ApiController, :show_news
    end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

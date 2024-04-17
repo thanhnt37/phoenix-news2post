@@ -16,6 +16,6 @@ defmodule News2Post.CRUD.News do
   def changeset(news, attrs) do
     news
     |> cast(attrs, [:title, :description, :url, :status, :published_at])
-    |> validate_required([:title, :description, :url])
+    |> validate_required([:title, :description, :url, :published_at])
   end
 end
