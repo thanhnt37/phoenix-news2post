@@ -43,7 +43,7 @@ defmodule News2PostWeb.Router do
 
      get "/v1/posts", ApiController, :get_posts
      post "/v1/posts", ApiController, :create_post
-     get "/v1/posts/:id", ApiController, :show_post
+     get "/v1/posts/:sk", ApiController, :show_post
 
      get "/v1/news", ApiController, :get_news
      post "/v1/news", ApiController, :create_news
@@ -90,12 +90,12 @@ defmodule News2PostWeb.Router do
     get "/news", NewsController, :index
 
     get "/posts", PostController, :index
-    get "/posts/:id", PostController, :show
-    get "/posts/:id/edit", PostController, :edit
-    patch "/posts/:id", PostController, :update
-    put "/posts/:id", PostController, :update
-    delete "/posts/:id", PostController, :delete
-    get "/posts/:id/approve", PostController, :approve
+    get "/posts/:sk", PostController, :show
+    get "/posts/:sk/edit", PostController, :edit
+    patch "/posts/:sk", PostController, :update
+    put "/posts/:sk", PostController, :update
+    delete "/posts/:sk", PostController, :delete
+    get "/posts/:sk/approve", PostController, :approve
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update

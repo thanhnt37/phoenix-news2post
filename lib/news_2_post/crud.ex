@@ -6,8 +6,8 @@ defmodule News2Post.CRUD do
   alias News2Post.CRUD.News
   alias News2Post.CRUD.Post
 
-  @news_table_name "news2post_dev_News_v2"
-  @posts_table_name "news2post_dev_Posts_v2"
+  @news_table_name "news2post_dev_single_table"
+  @posts_table_name "news2post_dev_single_table"
 
 #  --------------------- News ---------------------
 
@@ -102,12 +102,48 @@ defmodule News2Post.CRUD do
     |> Dynamo.decode_item(as: Post)
   end
 
+  def get_posts_v2(status \\ "all", limit \\ 10, last_evaluated_key \\ %{}) do
+    opts =
+      if status != "all" do
+        %{
+          limit: limit,
+          expression_attribute_values: [pk: "posts"],
+          expression_attribute_names: %{"#pk" => "pk"},
+          key_condition_expression: "#pk = :pk"
+        }
+      else
+        %{ limit: limit }
+      end
+
+    opts =
+      if is_map(last_evaluated_key) and last_evaluated_key != %{} do
+        Map.put(opts, :exclusive_start_key, last_evaluated_key)
+      else
+        opts
+      end
+
+#    if is_map(last_evaluated_key) and last_evaluated_key != %{} do
+##      Map.put(opts, :exclusive_start_key, last_evaluated_key)
+#      opts = opts | %{exclusive_start_key: last_evaluated_key}
+#      IO.puts("..... last_evaluated_key: #{inspect(last_evaluated_key, pretty: true)}")
+#      IO.puts("..... opts: #{inspect(opts, pretty: true)}")
+#    end
+
+    IO.puts("..... opts 2: #{inspect(opts, pretty: true)}")
+
+    Dynamo.query(@posts_table_name, opts)
+    |> ExAws.request!
+    |> inspect_response()
+    |> handle_response()
+#    |> Dynamo.decode_item(as: Post)
+  end
+
   def get_post_by_id(id) do
     records = Dynamo.query(
-               @posts_table_name,
-               expression_attribute_values: [id: id],
-               expression_attribute_names: %{"#id" => "id"},
-               key_condition_expression: "#id = :id"
+                @posts_table_name,
+                expression_attribute_values: [pk: "posts", sk: id],
+                expression_attribute_names: %{"#pk" => "pk", "#sk" => "sk"},
+                key_condition_expression: "#pk = :pk AND #sk = :sk"
              )
              |> ExAws.request!
              |> Dynamo.decode_item(as: Post)
@@ -115,10 +151,10 @@ defmodule News2Post.CRUD do
     Enum.at(records, 0)
   end
 
-  def delete_post(id, created_at) do
+  def delete_post(id) do
     Dynamo.delete_item(
       @posts_table_name,
-      %{id: id, created_at: created_at}
+      %{pk: "posts", sk: id}
     )
     |> ExAws.request!
   end
@@ -134,14 +170,14 @@ defmodule News2Post.CRUD do
   #
   # ## Example
   #     iex> PostCRUD.update_post("123", "2022-01-01T00:00:00Z", %{title: "New Title", description: "New Description"})
-  def update_post(id, created_at, updated_data) do
+  def update_post(id, updated_data) do
     update_expression = build_update_expression(updated_data)
 
     expression_attribute_names = build_expression_attribute_names(updated_data)
 
     expression_attribute_values = build_expression_attribute_values(updated_data)
 
-    primary_key = %{id: id, created_at: created_at}
+    primary_key = %{pk: "posts", sk: id}
 
     update_item_params = %{
       update_expression: update_expression,
@@ -189,6 +225,36 @@ defmodule News2Post.CRUD do
         Map.put(acc, :"#{key}", value)
       end
     )
+  end
+
+  defp inspect_response(response) do
+    IO.puts("..... response: #{inspect(response, pretty: true)}")
+    response
+  end
+
+  def handle_response(%{"Items" => items_data, "Count" => count, "LastEvaluatedKey" => last_key, "ScannedCount" => scanned_count}) do
+    IO.puts("..... handle_response 2")
+    items = Enum.map(items_data, &Dynamo.decode_item(&1, as: Post))
+    last_key = last_key |> Dynamo.decode_item(as: Post)
+    %{
+      items: items,
+      count: count,
+      last_evaluated_key: %{
+        pk: last_key.pk,
+        sk: last_key.sk
+      },
+      scanned_count: scanned_count
+    }
+  end
+
+  def handle_response(%{"Items" => items_data, "Count" => count, "ScannedCount" => scanned_count}) do
+    IO.puts("..... handle_response 1")
+    handle_response(%{
+      "Items" => items_data,
+      "Count" => count,
+      "LastEvaluatedKey" => %{},  # Giả sử giá trị mặc định là nil
+      "ScannedCount" => scanned_count
+    })
   end
 
 end

@@ -16,7 +16,8 @@ defmodule News2PostWeb.ApiController do
     if changeset.valid? do
       post_id = UUID.uuid1()
       record = %{
-        "id": post_id,
+        "pk": "posts",
+        "sk": post_id,
         "title": params["title"],
         "description": params["description"],
         "sections": params["sections"],
@@ -39,8 +40,8 @@ defmodule News2PostWeb.ApiController do
     end
   end
 
-  def show_post(conn, %{"id" => id}) do
-    post = CRUD.get_post_by_id(id)
+  def show_post(conn, %{"sk" => sk}) do
+    post = CRUD.get_post_by_id(sk)
     render(conn, :show_post, post: post)
   end
 
@@ -55,7 +56,8 @@ defmodule News2PostWeb.ApiController do
     if changeset.valid? do
       news_id = UUID.uuid1()
       record = %{
-        "id": news_id,
+        "pk": "news",
+        "sk": news_id,
         "title": params["title"],
         "description": params["description"],
         "url": params["url"],
@@ -77,8 +79,8 @@ defmodule News2PostWeb.ApiController do
     end
   end
 
-  def show_news(conn, %{"id" => id}) do
-    news = CRUD.get_news_by_id(id)
+  def show_news(conn, %{"sk" => sk}) do
+    news = CRUD.get_news_by_id(sk)
     render(conn, :show_news, news: news)
   end
 

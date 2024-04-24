@@ -2,7 +2,9 @@ defmodule News2Post.CRUD.Post do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key {:sk, :binary_id, autogenerate: true}
   schema "posts" do
+    field :pk, :string
     field :title, :string
     field :description, :string
     field :sections, :string
@@ -16,6 +18,10 @@ defmodule News2Post.CRUD.Post do
     post
     |> cast(attrs, [:title, :description, :sections, :status, :url])
     |> validate_required([:title, :description, :sections, :url])
+  end
+
+  defimpl Phoenix.Param, for: News2Post.CRUD.Post do
+    def to_param(%{sk: sk}), do: sk
   end
 
 end
