@@ -102,18 +102,17 @@ defmodule News2Post.CRUD do
     |> Dynamo.decode_item(as: Post)
   end
 
-  def get_posts_v2(status \\ "all", limit \\ 10, last_evaluated_key \\ %{}) do
-    opts =
-      if status != "all" do
-        %{
-          limit: limit,
-          expression_attribute_values: [pk: "posts"],
-          expression_attribute_names: %{"#pk" => "pk"},
-          key_condition_expression: "#pk = :pk"
-        }
-      else
-        %{ limit: limit }
-      end
+  def get_posts_v2(status \\ "all", limit \\ 10, page_type \\ "next", last_evaluated_key \\ %{}) do
+    opts = %{
+      limit: limit,
+      expression_attribute_values: [pk: "posts"],
+      expression_attribute_names: %{"#pk" => "pk"},
+      key_condition_expression: "#pk = :pk"
+    }
+
+    if status != "all" do
+
+    end
 
     opts =
       if is_map(last_evaluated_key) and last_evaluated_key != %{} do
@@ -122,7 +121,15 @@ defmodule News2Post.CRUD do
         opts
       end
 
-#    if is_map(last_evaluated_key) and last_evaluated_key != %{} do
+    IO.puts("..... page_type: #{inspect(page_type, pretty: true)}")
+    opts =
+      if page_type == "previous" do
+        Map.put(opts, :scan_index_forward, true)
+      else
+        Map.put(opts, :scan_index_forward, false)
+      end
+
+    #    if is_map(last_evaluated_key) and last_evaluated_key != %{} do
 ##      Map.put(opts, :exclusive_start_key, last_evaluated_key)
 #      opts = opts | %{exclusive_start_key: last_evaluated_key}
 #      IO.puts("..... last_evaluated_key: #{inspect(last_evaluated_key, pretty: true)}")
@@ -134,7 +141,7 @@ defmodule News2Post.CRUD do
     Dynamo.query(@posts_table_name, opts)
     |> ExAws.request!
     |> inspect_response()
-    |> handle_response()
+    |> handle_response(opts)
 #    |> Dynamo.decode_item(as: Post)
   end
 
@@ -228,33 +235,103 @@ defmodule News2Post.CRUD do
   end
 
   defp inspect_response(response) do
-    IO.puts("..... response: #{inspect(response, pretty: true)}")
+#    IO.puts("..... response: #{inspect(response, pretty: true)}")
     response
   end
 
-  def handle_response(%{"Items" => items_data, "Count" => count, "LastEvaluatedKey" => last_key, "ScannedCount" => scanned_count}) do
+  def handle_response(%{"Items" => items_data, "Count" => count, "LastEvaluatedKey" => last_key, "ScannedCount" => scanned_count}, opts) do
     IO.puts("..... handle_response 2")
+    IO.puts("..... items: #{inspect(items_data, pretty: true)}")
+    IO.puts("..... count: #{inspect(count, pretty: true)}")
+    IO.puts("..... last_key: #{inspect(last_key, pretty: true)}")
     items = Enum.map(items_data, &Dynamo.decode_item(&1, as: Post))
+    items = Enum.sort_by(items, & &1.sk, :desc)
     last_key = last_key |> Dynamo.decode_item(as: Post)
+
+    next_key =
+      if count == 0 do
+        if opts.scan_index_forward do
+          opts.exclusive_start_key
+        else
+          %{}
+        end
+      else
+        last_item = Enum.at(items, -1)
+        %{
+          pk: last_item.pk,
+          sk: last_item.sk
+        }
+      end
+
+    previous_key =
+      if count == 0 do
+        if opts.scan_index_forward do
+          %{}
+        else
+          opts.exclusive_start_key
+        end
+      else
+        first_item = List.first(items)
+        %{
+          pk: first_item.pk,
+          sk: first_item.sk
+        }
+      end
+
+#    if count == 0 do
+#      if opts.scan_index_forward do
+#        previous_key = %{
+#          pk: last_key.pk,
+#          sk: last_key.sk
+#        }
+#        next_key = %{}
+#      else
+#        previous_key = %{}
+#        next_key = %{
+#          pk: last_key.pk,
+#          sk: last_key.sk
+#        }
+#      end
+#    else
+#      items = Enum.sort_by(items, & &1.sk, :desc)
+#      first_item = List.first(items)
+#      last_item = Enum.at(items, -1)
+#      previous_key = %{
+#        pk: first_item.pk,
+#        sk: first_item.sk
+#      }
+#      next_key = %{
+#        pk: last_item.pk,
+#        sk: last_item.sk
+#      }
+#    end
+
+    IO.puts("..... opts: #{inspect(opts, pretty: true)}")
+    IO.puts("..... scan_index_forward: #{inspect(opts.scan_index_forward, pretty: true)}")
+
+    IO.puts("..... previous_key: #{inspect(previous_key, pretty: true)}")
+    IO.puts("..... next_key: #{inspect(next_key, pretty: true)}")
+#    IO.puts("..... last_key: #{inspect(last_key, pretty: true)}")
+#    IO.puts("..... exclusive_start_key: #{inspect(opts.exclusive_start_key, pretty: true)}")
+
     %{
       items: items,
       count: count,
-      last_evaluated_key: %{
-        pk: last_key.pk,
-        sk: last_key.sk
-      },
+      last_evaluated_key: last_key,
+      next_key: next_key,
+      previous_key: previous_key,
       scanned_count: scanned_count
     }
   end
 
-  def handle_response(%{"Items" => items_data, "Count" => count, "ScannedCount" => scanned_count}) do
+  def handle_response(%{"Items" => items_data, "Count" => count, "ScannedCount" => scanned_count}, opts) do
     IO.puts("..... handle_response 1")
     handle_response(%{
       "Items" => items_data,
       "Count" => count,
       "LastEvaluatedKey" => %{},  # Giả sử giá trị mặc định là nil
       "ScannedCount" => scanned_count
-    })
+    }, opts)
   end
 
 end

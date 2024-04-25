@@ -30,23 +30,65 @@
   </select>
 </form>
 
-<.table id="posts" rows={@posts.items} row_click={&JS.navigate(~p"/posts/#{&1}")}>
-  <:col :let={post} label="ID"><%= post.sk %></:col>
-  <:col :let={post} label="Title" class="w-80"><%= post.title %></:col>
-  <:col :let={post} label="Description"><%= post.description %></:col>
+<div class="list-items min-h-[100px]">
+  <.table id="posts" rows={@posts.items} row_click={&JS.navigate(~p"/posts/#{&1}")}>
+    <:col :let={post} label="ID"><%= post.sk %></:col>
+    <:col :let={post} label="Title" class="w-80"><%= post.title %></:col>
+    <:col :let={post} label="Description"><%= post.description %></:col>
 
-  <:col :let={post} label="Status">
-    <%= if post.status == "approved" do %>
+    <:col :let={post} label="Status">
+      <%= if post.status == "approved" do %>
       <span class="text-lime-600"><%= post.status %></span>
-    <% else %>
+      <% else %>
       <span><%= post.status %></span>
+      <% end %>
+    </:col>
+
+    <:action :let={post}>
+      <div class="sr-only">
+        <.link navigate={~p"/posts/#{post}"}>Show</.link>
+      </div>
+    </:action>
+  </.table>
+
+  <%= if @posts.count == 0 do %>
+  <p class="text-sm text-left leading-6 text-zinc-500 font-normal">No more records found.</p>
+  <% end %>
+</div>
+
+<div class="pagination">
+  <div class="flex justify-center">
+    <!-- Previous Button -->
+    <%= if @previous_key == "{}" do %>
+    <button disabled class="flex items-center justify-center px-4 h-10 me-3 text-base font-medium text-gray-400 bg-white border border-gray-300 rounded-lg cursor-not-allowed">
+      <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+      </svg>
+      Previous
+    </button>
+    <% else %>
+    <a href={~p"/posts?k=#{@previous_key}&t=previous"} class="flex items-center justify-center px-4 h-10 me-3 text-base font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+      <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+      </svg>
+      Previous
+    </a>
     <% end %>
-  </:col>
 
-  <:action :let={post}>
-    <div class="sr-only">
-      <.link navigate={~p"/posts/#{post}"}>Show</.link>
-    </div>
-  </:action>
-</.table>
-
+    <%= if @next_key == "{}" do %>
+    <a class="flex items-center justify-center px-4 h-10 text-base font-medium text-gray-400 bg-white border border-gray-300 rounded-lg cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600">
+      Next
+      <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+      </svg>
+    </a>
+    <% else %>
+    <a href={~p"/posts?k=#{@next_key}&t=next"} class="flex items-center justify-center px-4 h-10 text-base font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+      Next
+      <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+      </svg>
+    </a>
+    <% end %>
+  </div>
+</div>

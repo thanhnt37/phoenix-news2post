@@ -8,14 +8,15 @@ defmodule News2PostWeb.PostController do
   def index(conn, _params) do
     status = Map.get(conn.params, "status", "all")
     last_evaluated_key = Map.get(conn.params, "k", "{}")
+    page_type = Map.get(conn.params, "t", "next")
     last_evaluated_key = JSON.decode!(last_evaluated_key)
     IO.inspect(conn.params)
     IO.inspect(last_evaluated_key)
 
-    posts = CRUD.get_posts_v2(status, 2, last_evaluated_key)
+    posts = CRUD.get_posts_v2(status, 2, page_type, last_evaluated_key)
 #    IO.puts("..... posts: #{inspect(posts, pretty: true)}")
 
-    render(conn, :index, posts: posts, status: status, last_evaluated_key: JSON.encode!(posts.last_evaluated_key))
+    render(conn, :index, posts: posts, status: status, next_key: JSON.encode!(posts.next_key), previous_key: JSON.encode!(posts.previous_key))
   end
 
   def show(conn, %{"sk" => sk}) do
