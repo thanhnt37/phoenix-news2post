@@ -6,9 +6,15 @@ defmodule News2PostWeb.ApiController do
   alias News2Post.CRUD.Post
 
   def get_posts(conn, _params) do
-    posts = CRUD.all_posts()
+    page_size = 10
+    status = Map.get(conn.params, "status", "all")
+    last_evaluated_key = Map.get(conn.params, "k", "{}")
+    last_evaluated_key = JSON.decode!(last_evaluated_key)
+    page_type = Map.get(conn.params, "t", "next")
 
-    render(conn, :get_posts, posts: posts)
+    posts = CRUD.get_posts_v2(status, page_size, page_type, last_evaluated_key)
+
+    render(conn, :get_posts, posts: posts.items)
   end
 
   def create_post(conn, params) do
@@ -46,9 +52,14 @@ defmodule News2PostWeb.ApiController do
   end
 
   def get_news(conn, _params) do
-    news = CRUD.all_news()
+    page_size = 10
+    last_evaluated_key = Map.get(conn.params, "k", "{}")
+    last_evaluated_key = JSON.decode!(last_evaluated_key)
+    page_type = Map.get(conn.params, "t", "next")
 
-    render(conn, :get_news, news: news)
+    news = CRUD.get_news_v2(page_size, page_type, last_evaluated_key)
+
+    render(conn, :get_news, news: news.items)
   end
 
   def create_news(conn, params) do

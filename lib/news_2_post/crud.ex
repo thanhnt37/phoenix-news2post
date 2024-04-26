@@ -64,12 +64,12 @@ defmodule News2Post.CRUD do
     |> ExAws.request!
   end
 
-  def get_news_by_id(id) do
+  def get_news_by_id(sk) do
     records = Dynamo.query(
-               @news_table_name,
-               expression_attribute_values: [id: id],
-               expression_attribute_names: %{"#id" => "id"},
-               key_condition_expression: "#id = :id"
+                @news_table_name,
+                expression_attribute_values: %{"pk" => "news", "sk" => sk},
+                expression_attribute_names: %{"#pk" => "pk", "#sk" => "sk"},
+                key_condition_expression: "#pk = :pk AND #sk = :sk"
              )
              |> ExAws.request!
              |> Dynamo.decode_item(as: News)
@@ -172,10 +172,10 @@ defmodule News2Post.CRUD do
     |> handle_response(opts, Post)
   end
 
-  def get_post_by_id(id) do
+  def get_post_by_id(sk) do
     records = Dynamo.query(
                 @posts_table_name,
-                expression_attribute_values: [pk: "posts", sk: id],
+                expression_attribute_values: %{"pk" => "posts", "sk" => sk},
                 expression_attribute_names: %{"#pk" => "pk", "#sk" => "sk"},
                 key_condition_expression: "#pk = :pk AND #sk = :sk"
              )
