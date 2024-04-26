@@ -105,14 +105,22 @@ defmodule News2Post.CRUD do
   def get_posts_v2(status \\ "all", limit \\ 10, page_type \\ "next", last_evaluated_key \\ %{}) do
     opts = %{
       limit: limit,
-      expression_attribute_values: [pk: "posts"],
+      expression_attribute_values: %{"pk" => "posts"},
       expression_attribute_names: %{"#pk" => "pk"},
       key_condition_expression: "#pk = :pk"
     }
 
-    if status != "all" do
-
-    end
+    opts =
+      if status != "all" do
+        filter = %{
+          expression_attribute_values: Map.put(opts.expression_attribute_values, "status", status),
+          expression_attribute_names: Map.put(opts.expression_attribute_names, "#status", "status"),
+          filter_expression: "#status = :status"
+        }
+        Map.merge(opts, filter)
+      else
+        opts
+      end
 
     opts =
       if is_map(last_evaluated_key) and last_evaluated_key != %{} do
@@ -129,20 +137,10 @@ defmodule News2Post.CRUD do
         Map.put(opts, :scan_index_forward, false)
       end
 
-    #    if is_map(last_evaluated_key) and last_evaluated_key != %{} do
-##      Map.put(opts, :exclusive_start_key, last_evaluated_key)
-#      opts = opts | %{exclusive_start_key: last_evaluated_key}
-#      IO.puts("..... last_evaluated_key: #{inspect(last_evaluated_key, pretty: true)}")
-#      IO.puts("..... opts: #{inspect(opts, pretty: true)}")
-#    end
-
-    IO.puts("..... opts 2: #{inspect(opts, pretty: true)}")
-
     Dynamo.query(@posts_table_name, opts)
     |> ExAws.request!
     |> inspect_response()
     |> handle_response(opts)
-#    |> Dynamo.decode_item(as: Post)
   end
 
   def get_post_by_id(id) do
@@ -235,84 +233,73 @@ defmodule News2Post.CRUD do
   end
 
   defp inspect_response(response) do
-#    IO.puts("..... response: #{inspect(response, pretty: true)}")
+#    IO.puts(".............. response: #{inspect(response, pretty: true)}")
     response
   end
 
   def handle_response(%{"Items" => items_data, "Count" => count, "LastEvaluatedKey" => last_key, "ScannedCount" => scanned_count}, opts) do
-    IO.puts("..... handle_response 2")
-    IO.puts("..... items: #{inspect(items_data, pretty: true)}")
-    IO.puts("..... count: #{inspect(count, pretty: true)}")
-    IO.puts("..... last_key: #{inspect(last_key, pretty: true)}")
     items = Enum.map(items_data, &Dynamo.decode_item(&1, as: Post))
     items = Enum.sort_by(items, & &1.sk, :desc)
     last_key = last_key |> Dynamo.decode_item(as: Post)
+    last_key = %{
+      pk: last_key.pk,
+      sk: last_key.sk
+    }
 
     next_key =
-      if count == 0 do
+      if last_key.pk == nil do
+        # scan_index_forward = true --> previous page
         if opts.scan_index_forward do
-          opts.exclusive_start_key
+          if count != 0 do
+            last_item = Enum.at(items, -1)
+            %{
+              pk: last_item.pk,
+              sk: last_item.sk
+            }
+          else
+            %{}
+          end
         else
+          # --> next page
           %{}
         end
       else
-        last_item = Enum.at(items, -1)
         %{
-          pk: last_item.pk,
-          sk: last_item.sk
+          pk: last_key.pk,
+          sk: last_key.sk
         }
       end
 
     previous_key =
-      if count == 0 do
+      if last_key.pk == nil do
+        # scan_index_forward = true --> previous page
         if opts.scan_index_forward do
           %{}
         else
-          opts.exclusive_start_key
+          if count != 0 do
+            first_item = List.first(items)
+            %{
+              pk: first_item.pk,
+              sk: first_item.sk
+            }
+          else
+            %{}
+          end
         end
       else
-        first_item = List.first(items)
-        %{
-          pk: first_item.pk,
-          sk: first_item.sk
-        }
+        # --> next page
+        if count != 0 do
+          first_item = List.first(items)
+          %{
+            pk: first_item.pk,
+            sk: first_item.sk
+          }
+        else
+          Map.get(opts, "exclusive_start_key", %{})
+        end
       end
 
-#    if count == 0 do
-#      if opts.scan_index_forward do
-#        previous_key = %{
-#          pk: last_key.pk,
-#          sk: last_key.sk
-#        }
-#        next_key = %{}
-#      else
-#        previous_key = %{}
-#        next_key = %{
-#          pk: last_key.pk,
-#          sk: last_key.sk
-#        }
-#      end
-#    else
-#      items = Enum.sort_by(items, & &1.sk, :desc)
-#      first_item = List.first(items)
-#      last_item = Enum.at(items, -1)
-#      previous_key = %{
-#        pk: first_item.pk,
-#        sk: first_item.sk
-#      }
-#      next_key = %{
-#        pk: last_item.pk,
-#        sk: last_item.sk
-#      }
-#    end
-
     IO.puts("..... opts: #{inspect(opts, pretty: true)}")
-    IO.puts("..... scan_index_forward: #{inspect(opts.scan_index_forward, pretty: true)}")
-
-    IO.puts("..... previous_key: #{inspect(previous_key, pretty: true)}")
-    IO.puts("..... next_key: #{inspect(next_key, pretty: true)}")
-#    IO.puts("..... last_key: #{inspect(last_key, pretty: true)}")
-#    IO.puts("..... exclusive_start_key: #{inspect(opts.exclusive_start_key, pretty: true)}")
 
     %{
       items: items,
