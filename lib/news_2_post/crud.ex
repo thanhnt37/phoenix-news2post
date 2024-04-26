@@ -28,6 +28,35 @@ defmodule News2Post.CRUD do
     |> Dynamo.decode_item(as: News)
   end
 
+  def get_news_v2(limit \\ 10, page_type \\ "next", last_evaluated_key \\ %{}) do
+    opts = %{
+      limit: limit,
+      expression_attribute_values: %{"pk" => "news"},
+      expression_attribute_names: %{"#pk" => "pk"},
+      key_condition_expression: "#pk = :pk"
+    }
+
+    opts =
+      if is_map(last_evaluated_key) and last_evaluated_key != %{} do
+        Map.put(opts, :exclusive_start_key, last_evaluated_key)
+      else
+        opts
+      end
+
+    IO.puts("..... page_type: #{inspect(page_type, pretty: true)}")
+    opts =
+      if page_type == "previous" do
+        Map.put(opts, :scan_index_forward, true)
+      else
+        Map.put(opts, :scan_index_forward, false)
+      end
+
+    Dynamo.query(@posts_table_name, opts)
+    |> ExAws.request!
+    |> inspect_response()
+    |> handle_response(opts, News)
+  end
+
   def create_news(attr) do
     IO.inspect(attr)
 
@@ -140,7 +169,7 @@ defmodule News2Post.CRUD do
     Dynamo.query(@posts_table_name, opts)
     |> ExAws.request!
     |> inspect_response()
-    |> handle_response(opts)
+    |> handle_response(opts, Post)
   end
 
   def get_post_by_id(id) do
@@ -237,10 +266,10 @@ defmodule News2Post.CRUD do
     response
   end
 
-  def handle_response(%{"Items" => items_data, "Count" => count, "LastEvaluatedKey" => last_key, "ScannedCount" => scanned_count}, opts) do
-    items = Enum.map(items_data, &Dynamo.decode_item(&1, as: Post))
+  def handle_response(%{"Items" => items_data, "Count" => count, "LastEvaluatedKey" => last_key, "ScannedCount" => scanned_count}, opts, model) do
+    items = Enum.map(items_data, &Dynamo.decode_item(&1, as: model))
     items = Enum.sort_by(items, & &1.sk, :desc)
-    last_key = last_key |> Dynamo.decode_item(as: Post)
+    last_key = last_key |> Dynamo.decode_item(as: model)
     last_key = %{
       pk: last_key.pk,
       sk: last_key.sk
@@ -311,14 +340,14 @@ defmodule News2Post.CRUD do
     }
   end
 
-  def handle_response(%{"Items" => items_data, "Count" => count, "ScannedCount" => scanned_count}, opts) do
+  def handle_response(%{"Items" => items_data, "Count" => count, "ScannedCount" => scanned_count}, opts, model) do
     IO.puts("..... handle_response 1")
     handle_response(%{
       "Items" => items_data,
       "Count" => count,
       "LastEvaluatedKey" => %{},  # Giả sử giá trị mặc định là nil
       "ScannedCount" => scanned_count
-    }, opts)
+    }, opts, model)
   end
 
 end

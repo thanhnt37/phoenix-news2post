@@ -14,7 +14,7 @@
           <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
           </svg>
-          <span class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">News</span>
+          <a href="/news" class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">News</a>
         </div>
       </li>
     </ol>
@@ -22,18 +22,62 @@
   <h1 class="text-lg font-semibold leading-8 text-zinc-800">Listing News</h1>
 </header>
 
-<.table id="news" rows={@news_collection}>
-  <:col :let={news} label="ID"><%= news.id %></:col>
-  <:col :let={news} label="Title" class="w-80"><%= news.title %></:col>
-  <:col :let={news} label="Description">
-    <span style="display:block; width: 370px; height: 70px; overflow: hidden; text-overflow: ellipsis;"><%= news.description %></span>
-  </:col>
-  <:col :let={news} label="Published At">
-    <span style="display:block; width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.published_at %></span>
-  </:col>
-  <:col :let={news} label="Actions">
-    <span style="display:block; width: 85px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="text-lime-600">
-      <a href={news.url} target="_blank">View Source</a>
-    </span>
-  </:col>
-</.table>
+
+<div class="list-items min-h-[100px]">
+  <.table id="news" rows={@news_collection.items}>
+    <:col :let={news} label="ID"><%= news.sk %></:col>
+    <:col :let={news} label="Title" class="w-80"><%= news.title %></:col>
+    <:col :let={news} label="Description">
+      <span style="display:block; width: 370px; height: 70px; overflow: hidden; text-overflow: ellipsis;"><%= news.description %></span>
+    </:col>
+    <:col :let={news} label="Published At">
+      <span style="display:block; width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.published_at %></span>
+    </:col>
+    <:col :let={news} label="Actions">
+      <span style="display:block; width: 85px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="text-lime-600">
+        <a href={news.url} target="_blank">View Source</a>
+      </span>
+    </:col>
+  </.table>
+
+  <%= if @news_collection.count == 0 do %>
+  <p class="text-sm text-left leading-6 text-zinc-500 font-normal">No more records found.</p>
+  <% end %>
+</div>
+
+<div class="pagination">
+  <div class="flex justify-center">
+    <!-- Previous Button -->
+    <%= if @previous_key == "{}" do %>
+    <button disabled class="flex items-center justify-center px-4 h-10 me-3 text-base font-medium text-gray-400 bg-white border border-gray-300 rounded-lg cursor-not-allowed">
+      <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+      </svg>
+      Previous
+    </button>
+    <% else %>
+    <a href={~p"/news?k=#{@previous_key}&t=previous"} class="flex items-center justify-center px-4 h-10 me-3 text-base font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+      <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+      </svg>
+      Previous
+    </a>
+    <% end %>
+
+    <%= if @next_key == "{}" do %>
+    <button disabled class="flex items-center justify-center px-4 h-10 me-3 text-base font-medium text-gray-400 bg-white border border-gray-300 rounded-lg cursor-not-allowed">
+      Next
+      <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+      </svg>
+    </button>
+    <% else %>
+    <a href={~p"/news?k=#{@next_key}&t=next"} class="flex items-center justify-center px-4 h-10 text-base font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+      Next
+      <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+      </svg>
+    </a>
+    <% end %>
+  </div>
+</div>
