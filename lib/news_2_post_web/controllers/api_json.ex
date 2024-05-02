@@ -29,7 +29,7 @@ defmodule News2PostWeb.ApiJSON do
 
   defp post_detail(%Post{} = post) do
     %{
-      id: post.id,
+      sk: post.sk,
       title: post.title,
       description: post.description,
       sections: post.sections,
@@ -41,7 +41,7 @@ defmodule News2PostWeb.ApiJSON do
 
   defp news_detail(%News{} = news) do
     %{
-      id: news.id,
+      sk: news.sk,
       title: news.title,
       description: news.description,
       url: news.url,

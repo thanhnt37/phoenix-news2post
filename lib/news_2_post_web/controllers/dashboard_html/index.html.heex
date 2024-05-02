@@ -87,7 +87,7 @@
 
     <div class="mt-10">
         <.table id="news" rows={@news_collection}>
-            <:col :let={news} label="ID"><%= news.id %></:col>
+            <:col :let={news} label="ID"><%= news.sk %></:col>
             <:col :let={news} label="Source">
                 <span style="display:block; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.url %></span>
             </:col>

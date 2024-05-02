@@ -6,9 +6,15 @@ defmodule News2PostWeb.ApiController do
   alias News2Post.CRUD.Post
 
   def get_posts(conn, _params) do
-    posts = CRUD.all_posts()
+    page_size = 10
+    status = Map.get(conn.params, "status", "all")
+    last_evaluated_key = Map.get(conn.params, "k", "{}")
+    last_evaluated_key = JSON.decode!(last_evaluated_key)
+    page_type = Map.get(conn.params, "t", "next")
 
-    render(conn, :get_posts, posts: posts)
+    posts = CRUD.get_posts_v2(status, page_size, page_type, last_evaluated_key)
+
+    render(conn, :get_posts, posts: posts.items)
   end
 
   def create_post(conn, params) do
@@ -16,7 +22,8 @@ defmodule News2PostWeb.ApiController do
     if changeset.valid? do
       post_id = UUID.uuid1()
       record = %{
-        "id": post_id,
+        "pk": "posts",
+        "sk": post_id,
         "title": params["title"],
         "description": params["description"],
         "sections": params["sections"],
@@ -39,15 +46,20 @@ defmodule News2PostWeb.ApiController do
     end
   end
 
-  def show_post(conn, %{"id" => id}) do
-    post = CRUD.get_post_by_id(id)
+  def show_post(conn, %{"sk" => sk}) do
+    post = CRUD.get_post_by_id(sk)
     render(conn, :show_post, post: post)
   end
 
   def get_news(conn, _params) do
-    news = CRUD.all_news()
+    page_size = 10
+    last_evaluated_key = Map.get(conn.params, "k", "{}")
+    last_evaluated_key = JSON.decode!(last_evaluated_key)
+    page_type = Map.get(conn.params, "t", "next")
 
-    render(conn, :get_news, news: news)
+    news = CRUD.get_news_v2(page_size, page_type, last_evaluated_key)
+
+    render(conn, :get_news, news: news.items)
   end
 
   def create_news(conn, params) do
@@ -55,7 +67,8 @@ defmodule News2PostWeb.ApiController do
     if changeset.valid? do
       news_id = UUID.uuid1()
       record = %{
-        "id": news_id,
+        "pk": "news",
+        "sk": news_id,
         "title": params["title"],
         "description": params["description"],
         "url": params["url"],
@@ -77,8 +90,8 @@ defmodule News2PostWeb.ApiController do
     end
   end
 
-  def show_news(conn, %{"id" => id}) do
-    news = CRUD.get_news_by_id(id)
+  def show_news(conn, %{"sk" => sk}) do
+    news = CRUD.get_news_by_id(sk)
     render(conn, :show_news, news: news)
   end
 
