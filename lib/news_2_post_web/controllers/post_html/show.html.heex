@@ -35,7 +35,7 @@
             <.link href={~p"/posts/#{@post}/edit"}>
                 <.button class="bg-yellow-600 mr-2">Edit post</.button>
             </.link>
-            <.link href={~p"/posts/#{@post}/approve?_tk=#{get_csrf_token()}"}>
+            <.link href={~p"/posts/#{@post}/approve"} method="post" data-confirm="Are you sure you want to approve this post?">
                 <.button class="bg-green-600">Approve</.button>
             </.link>
             <.link href={~p"/posts/#{@post}"} method="delete" data-confirm="Are you sure?">
