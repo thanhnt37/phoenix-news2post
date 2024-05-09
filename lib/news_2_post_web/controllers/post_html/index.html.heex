@@ -37,10 +37,13 @@
     <:col :let={post} label="Description"><%= post.description %></:col>
 
     <:col :let={post} label="Status">
-      <%= if post.status == "approved" do %>
-      <span class="text-lime-600"><%= post.status %></span>
-      <% else %>
-      <span><%= post.status %></span>
+      <%= cond do %>
+        <% post.status == "approved" -> %>
+          <span class="text-green-600"><%= post.status %></span>
+        <% post.status == "published" -> %>
+          <span class="text-violet-600"><%= post.status %></span>
+        <% true -> %>
+          <span><%= post.status %></span>
       <% end %>
     </:col>
 

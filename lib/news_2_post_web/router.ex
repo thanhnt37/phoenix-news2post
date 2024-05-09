@@ -95,7 +95,8 @@ defmodule News2PostWeb.Router do
     patch "/posts/:sk", PostController, :update
     put "/posts/:sk", PostController, :update
     delete "/posts/:sk", PostController, :delete
-    post "/posts/:sk/approve", PostController, :approve
+    put "/posts/:sk/approve", PostController, :approve
+    put "/posts/:sk/publish", PostController, :publish
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update

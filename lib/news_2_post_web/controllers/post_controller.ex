@@ -62,7 +62,18 @@ defmodule News2PostWeb.PostController do
 
   def approve(conn, params) do
     post = CRUD.get_post_by_id(params["sk"])
+    # TODO: validation
     CRUD.update_post(post.sk, %{:status => "approved"})
+
+    conn
+    |> put_flash(:info, "Post Approved successfully.")
+    |> redirect(to: ~p"/posts")
+  end
+
+  def publish(conn, params) do
+    post = CRUD.get_post_by_id(params["sk"])
+    # TODO: validation
+    CRUD.update_post(post.sk, %{:status => "published"})
 
     conn
     |> put_flash(:info, "Post Approved successfully.")

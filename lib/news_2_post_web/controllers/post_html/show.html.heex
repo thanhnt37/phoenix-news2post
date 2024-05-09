@@ -31,18 +31,30 @@
         <h1 class="text-lg font-semibold leading-8 text-zinc-800"><%= @post.title %></h1>
     </div>
     <div class="flex-none">
-        <%= if @post.status == "reviewing" do %>
+        <%= cond do %>
+          <% @post.status == "reviewing" -> %>
             <.link href={~p"/posts/#{@post}/edit"}>
                 <.button class="bg-yellow-600 mr-2">Edit post</.button>
             </.link>
-            <.link href={~p"/posts/#{@post}/approve"} method="post" data-confirm="Are you sure you want to approve this post?">
+            <.link href={~p"/posts/#{@post}/approve"} method="put" data-confirm="Are you sure you want to approve this post?">
                 <.button class="bg-green-600">Approve</.button>
             </.link>
             <.link href={~p"/posts/#{@post}"} method="delete" data-confirm="Are you sure?">
                 <.button class="bg-red-600">Delete</.button>
             </.link>
             <.link href={~p"/posts"}>
-                <.button class="bg-slate-600 mr-2">Cancel</.button>
+                <.button class="bg-slate-600 mr-2">Back</.button>
+            </.link>
+          <% @post.status == "approved" -> %>
+            <.link href={~p"/posts/#{@post}/publish"} method="put" data-confirm="Are you sure you want to publish this post?">
+                <.button class="bg-green-600">Publish</.button>
+            </.link>
+            <.link href={~p"/posts"}>
+                <.button class="bg-slate-600 mr-2">Back</.button>
+            </.link>
+        <% true -> %>
+            <.link href={~p"/posts"}>
+                <.button class="bg-slate-600 mr-2">Back</.button>
             </.link>
         <% end %>
     </div>
