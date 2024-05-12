@@ -61,23 +61,29 @@ defmodule News2PostWeb.PostController do
   end
 
   def approve(conn, params) do
+    referer_url = Plug.Conn.get_req_header(conn, "referer")
+                  |> List.first()
+
     post = CRUD.get_post_by_id(params["sk"])
     # TODO: validation
     CRUD.update_post(post.sk, %{:status => "approved"})
 
     conn
-    |> put_flash(:info, "Post Approved successfully.")
-    |> redirect(to: ~p"/posts")
+    |> put_flash(:info, "Post approved successfully.")
+    |> redirect(external: referer_url)
   end
 
   def publish(conn, params) do
+    referer_url = Plug.Conn.get_req_header(conn, "referer")
+                  |> List.first()
+
     post = CRUD.get_post_by_id(params["sk"])
     # TODO: validation
     CRUD.update_post(post.sk, %{:status => "published"})
 
     conn
-    |> put_flash(:info, "Post Approved successfully.")
-    |> redirect(to: ~p"/posts")
+    |> put_flash(:info, "Post published successfully.")
+    |> redirect(external: referer_url)
   end
 
   def delete(conn, %{"sk" => sk}) do

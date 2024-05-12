@@ -95,12 +95,12 @@
 
             <:col :let={news} label="Actions">
                 <%= if news.status == "approved" do %>
-                    <.link href="#" method="put" data-confirm="Are you confirm to publish this News?">
+                    <.link href={~p"/posts/#{news}/publish"} method="put" data-confirm="Are you confirm to publish this News?">
                         <span class="w-24 block text-center bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Publish</span>
                     </.link>
                 <% else %>
                     <%= if news.status == "reviewing" do %>
-                        <.link href="#" method="put" data-confirm="Are you sure to approve this News?">
+                        <.link href={~p"/posts/#{news}/approve"} method="put" data-confirm="Are you sure you want to approve this post?">
                             <span class="w-24 block text-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Approve</span>
                         </.link>
                     <% else %>
