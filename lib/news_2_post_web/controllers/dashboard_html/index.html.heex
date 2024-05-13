@@ -94,20 +94,23 @@
             <:col :let={news} label="Title" class="w-80"><%= news.title %></:col>
 
             <:col :let={news} label="Actions">
-                <%= if news.status == "approved" do %>
-                    <.link href={~p"/posts/#{news}/publish"} method="put" data-confirm="Are you confirm to publish this News?">
-                        <span class="w-24 block text-center bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Publish</span>
-                    </.link>
-                <% else %>
-                    <%= if news.status == "reviewing" do %>
-                        <.link href={~p"/posts/#{news}/approve"} method="put" data-confirm="Are you sure you want to approve this post?">
-                            <span class="w-24 block text-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Approve</span>
+                <%= cond do %>
+                    <% news.status == "approved" -> %>
+                        <.link href={~p"/posts/#{news}/publish"} method="put" data-confirm="Are you confirm to publish this News?">
+                            <span class="w-24 block text-center bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Publish</span>
                         </.link>
-                    <% else %>
+                    <% news.status == "raw" -> %>
                         <.link href="#" method="put" data-confirm="Are you sure to re-write this News?">
                             <span class="w-24 block text-center min-w-fit bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Re-write</span>
                         </.link>
-                    <% end %>
+                    <% news.status == "reviewing" -> %>
+                        <.link href={~p"/posts/#{news}/approve"} method="put" data-confirm="Are you sure you want to approve this post?">
+                            <span class="w-24 block text-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Approve</span>
+                        </.link>
+                    <% news.status == "published" -> %>
+                        <span class="text-violet-600"><%= news.status %></span>
+                    <% true -> %>
+                        <span><%= news.status %></span>
                 <% end %>
             </:col>
         </.table>
