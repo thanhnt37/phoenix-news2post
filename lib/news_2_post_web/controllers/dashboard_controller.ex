@@ -17,13 +17,22 @@ defmodule News2PostWeb.DashboardController do
         stats
       end
 
+    stats = CRUD.get_stats_posts()
+    posts_stats =
+      if stats == nil do
+        tmp_stats = stats_posts(%{});
+        CRUD.create_stats_posts(tmp_stats)
+        tmp_stats
+      else
+        stats
+      end
+
     news = CRUD.get_news_v2(5, "next", %{})
     posts = CRUD.get_posts_v2("all", 5, "next", %{})
-
     collection = Enum.concat(posts.items, news.items)
     collection = Enum.sort_by(collection, & &1.sk, &>=/2)
 
-    render(conn, :index, news_collection: collection, formatted_date: formatted_date, news_stats: news_stats)
+    render(conn, :index, news_collection: collection, formatted_date: formatted_date, news_stats: news_stats, posts_stats: posts_stats)
   end
 
   defp stats_news(last_key, stats \\ %{}) do
@@ -39,6 +48,24 @@ defmodule News2PostWeb.DashboardController do
 
     if news.last_evaluated_key != %{} && news.last_evaluated_key.sk != nil do
       stats_news(news.last_evaluated_key, total_stats)
+    else
+      total_stats
+    end
+  end
+
+  defp stats_posts(last_key, stats \\ %{}) do
+    posts = CRUD.get_posts_v2("all", 100, "next", last_key)
+    new_stats = count_items(posts.items)
+
+    total_stats = %{
+      today: new_stats.today + Map.get(stats, :today, 0),
+      this_month: new_stats.this_month + Map.get(stats, :this_month, 0),
+      this_quarter: new_stats.this_quarter + Map.get(stats, :this_quarter, 0),
+      this_year: new_stats.this_year + Map.get(stats, :this_year, 0)
+    }
+
+    if posts.last_evaluated_key != %{} && posts.last_evaluated_key.sk != nil do
+      stats_posts(posts.last_evaluated_key, total_stats)
     else
       total_stats
     end

@@ -30,19 +30,19 @@
                 <tbody>
                 <tr>
                     <td class="w-20 text-slate-700">Today:</td>
-                    <td class="m-0 tracking-widest text-lg">0 items</td>
+                    <td class="m-0 tracking-widest text-lg"><%= @posts_stats.today %> items</td>
                 </tr>
                 <tr>
                     <td class="w-20 text-slate-700">Month:</td>
-                    <td class="m-0 tracking-widest text-lg">15 items</td>
+                    <td class="m-0 tracking-widest text-lg"><%= @posts_stats.this_month %> items</td>
                 </tr>
                 <tr>
                     <td class="w-20 text-slate-700">Quarter:</td>
-                    <td class="m-0 tracking-widest text-lg">123 items</td>
+                    <td class="m-0 tracking-widest text-lg"><%= @posts_stats.this_quarter %> items</td>
                 </tr>
                 <tr>
                     <td class="w-20 text-slate-700">Year:</td>
-                    <td class="m-0 tracking-widest text-lg">221 items</td>
+                    <td class="m-0 tracking-widest text-lg"><%= @posts_stats.this_year %> items</td>
                 </tr>
                 </tbody>
             </table>

@@ -261,6 +261,38 @@ defmodule News2Post.CRUD do
     |> ExAws.request!()
   end
 
+  def create_stats_posts(attrs) do
+    date = Date.to_string(Date.utc_today())
+
+    data = %{
+      pk: "statistics",
+      sk: "posts##{date}",
+      today: attrs.today,
+      this_month: attrs.this_month,
+      this_quarter: attrs.this_quarter,
+      this_year: attrs.this_year,
+      "created_at": DateTime.to_string(DateTime.utc_now())
+    }
+    IO.inspect(data)
+
+    Dynamo.put_item(@single_table_name, data)
+    |> ExAws.request!
+  end
+
+  def get_stats_posts() do
+    date = Date.to_string(Date.utc_today())
+    records = Dynamo.query(
+                @single_table_name,
+                expression_attribute_values: %{"pk" => "statistics", "sk" => "posts##{date}"},
+                expression_attribute_names: %{"#pk" => "pk", "#sk" => "sk"},
+                key_condition_expression: "#pk = :pk AND #sk = :sk"
+              )
+              |> ExAws.request!
+              |> Dynamo.decode_item(as: Stats)
+
+    Enum.at(records, 0)
+  end
+
 #  --------------------- PRIVATE ---------------------
 
   defp build_update_expression(updated_data) do
