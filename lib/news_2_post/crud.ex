@@ -5,7 +5,9 @@ defmodule News2Post.CRUD do
 
   alias News2Post.CRUD.News
   alias News2Post.CRUD.Post
+  alias News2Post.CRUD.Stats
 
+  @single_table_name "news2post_dev_single_table"
   @news_table_name "news2post_dev_single_table"
   @posts_table_name "news2post_dev_single_table"
 
@@ -43,7 +45,7 @@ defmodule News2Post.CRUD do
         opts
       end
 
-    IO.puts("..... page_type: #{inspect(page_type, pretty: true)}")
+#    IO.puts("..... page_type: #{inspect(page_type, pretty: true)}")
     opts =
       if page_type == "previous" do
         Map.put(opts, :scan_index_forward, true)
@@ -73,6 +75,39 @@ defmodule News2Post.CRUD do
              )
              |> ExAws.request!
              |> Dynamo.decode_item(as: News)
+
+    Enum.at(records, 0)
+  end
+
+  def create_stats_news(attrs) do
+    date = Date.to_string(Date.utc_today())
+    IO.puts("............... date: #{inspect(date, pretty: true)}")
+
+    data = %{
+      pk: "statistics",
+      sk: "news##{date}",
+      today: attrs.today,
+      this_month: attrs.this_month,
+      this_quarter: attrs.this_quarter,
+      this_year: attrs.this_year,
+      "created_at": DateTime.to_string(DateTime.utc_now())
+    }
+    IO.inspect(data)
+
+    Dynamo.put_item(@single_table_name, data)
+    |> ExAws.request!
+  end
+
+  def get_stats_news() do
+    date = Date.to_string(Date.utc_today())
+    records = Dynamo.query(
+                @single_table_name,
+                expression_attribute_values: %{"pk" => "statistics", "sk" => "news##{date}"},
+                expression_attribute_names: %{"#pk" => "pk", "#sk" => "sk"},
+                key_condition_expression: "#pk = :pk AND #sk = :sk"
+             )
+             |> ExAws.request!
+             |> Dynamo.decode_item(as: Stats)
 
     Enum.at(records, 0)
   end
@@ -158,7 +193,7 @@ defmodule News2Post.CRUD do
         opts
       end
 
-    IO.puts("..... page_type: #{inspect(page_type, pretty: true)}")
+#    IO.puts("..... page_type: #{inspect(page_type, pretty: true)}")
     opts =
       if page_type == "previous" do
         Map.put(opts, :scan_index_forward, true)
@@ -328,7 +363,7 @@ defmodule News2Post.CRUD do
         end
       end
 
-    IO.puts("..... opts: #{inspect(opts, pretty: true)}")
+#    IO.puts("..... opts: #{inspect(opts, pretty: true)}")
 
     %{
       items: items,
