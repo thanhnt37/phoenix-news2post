@@ -8,6 +8,10 @@ defmodule News2Post.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
+    field :first_name, :string
+    field :last_name, :string
+    field :role, :string, default: "user" # admin || user
+
     timestamps(type: :utc_datetime)
   end
 
@@ -36,9 +40,10 @@ defmodule News2Post.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :first_name, :last_name, :role])
     |> validate_email(opts)
     |> validate_password(opts)
+    |> validate_role()
   end
 
   defp validate_email(changeset, opts) do
@@ -155,4 +160,9 @@ defmodule News2Post.Accounts.User do
       add_error(changeset, :current_password, "is not valid")
     end
   end
+
+  defp validate_role(changeset) do
+    validate_inclusion(changeset, :role, ["admin", "user"], message: "Role must be either 'admin' or 'user'")
+  end
+
 end
