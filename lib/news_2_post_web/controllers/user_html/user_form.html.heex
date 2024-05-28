@@ -1,0 +1,38 @@
+<.simple_form :let={f} for={@changeset} action={@action}>
+  <.error :if={@changeset.action}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+
+  <div class="flex space-x-4">
+    <div class="flex-1">
+      <.input field={f[:first_name]} type="text" label="First Name" />
+    </div>
+    <div class="flex-1">
+      <.input field={f[:last_name]} type="text" label="Last Name" />
+    </div>
+  </div>
+
+  <%= if @is_new do %>
+    <div class="mt-4">
+      <.input field={f[:email]} type="email" label="Email" class="w-full"  />
+    </div>
+  <% else %>
+    <div class="mt-4">
+      <.input field={f[:email]} type="email" label="Email" class="w-full" disabled />
+    </div>
+  <% end %>
+
+  <%= if @is_new do %>
+    <div class="mt-4">
+      <.input field={f[:password]} type="password" label="Password" class="w-full" />
+    </div>
+  <% end %>
+
+  <div class="mt-4">
+    <.input field={f[:role]} type="select" label="Role" options={[{"Admin", "admin"}, {"User", "user"}]} class="w-full" />
+  </div>
+
+  <:actions>
+    <.button class="bg-green-600">Save User</.button>
+  </:actions>
+</.simple_form>

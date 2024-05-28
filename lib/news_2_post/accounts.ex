@@ -10,6 +10,10 @@ defmodule News2Post.Accounts do
 
   ## Database getters
 
+  def list_users do
+    Repo.all(User)
+  end
+
   @doc """
   Gets a user by email.
 
@@ -349,5 +353,15 @@ defmodule News2Post.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  def update_user_basic_info(user, attrs) do
+    user
+    |> User.basic_info_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_user(user) do
+    Repo.delete(user)
   end
 end

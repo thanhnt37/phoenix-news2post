@@ -46,6 +46,12 @@ defmodule News2Post.Accounts.User do
     |> validate_role()
   end
 
+  def basic_info_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:first_name, :last_name, :role])
+    |> validate_role()
+  end
+
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])

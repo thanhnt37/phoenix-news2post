@@ -1,0 +1,15 @@
+<.header>
+  Listing Users
+  <:actions>
+    <.link href={~p"/users/new"}>
+      <.button class="bg-slate-600">New User</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="users" rows={@users} row_click={&JS.navigate(~p"/users/#{&1}")}>
+  <:col :let={user} label="ID"><%= user.id %></:col>
+  <:col :let={user} label="Email"><%= user.email %></:col>
+  <:col :let={user} label="Full Name"><span class="capitalize"><%= "#{user.first_name} #{user.last_name}" %></span></:col>
+  <:col :let={user} label="Role"><%= user.role %></:col>
+</.table>
