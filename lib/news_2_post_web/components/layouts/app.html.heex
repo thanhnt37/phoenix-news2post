@@ -3,6 +3,43 @@
     <div class="md:max-w-5xl mx-auto flex justify-between bg-cyan-600 px-4 sm:px-6 lg:px-8 py-4 rounded-xl">
       <div class="">
         <a href="/"><h1 class="uppercase tracking-widest font-bold text-lg">News2Post</h1></a>
+
+        <%= if @current_user && @current_user.role == "admin" do %>
+          <ul class="relative z-10 flex items-center gap-4">
+            <li>
+              <.link
+              href={~p"/"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              >
+              Dashboard
+            </.link>
+            </li>
+            <li>
+              <.link
+              href={~p"/posts"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              >
+              Posts
+            </.link>
+            </li>
+            <li>
+              <.link
+              href={~p"/news"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              >
+              News
+            </.link>
+            </li>
+            <li>
+              <.link
+              href={~p"/users"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              >
+              Users
+            </.link>
+            </li>
+          </ul>
+        <% end %>
       </div>
 
       <div class="">

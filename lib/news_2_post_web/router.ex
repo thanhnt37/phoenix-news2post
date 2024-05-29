@@ -98,12 +98,17 @@ defmodule News2PostWeb.Router do
     put "/posts/:sk/approve", PostController, :approve
     put "/posts/:sk/publish", PostController, :publish
 
-    resources "/users", UserController
-
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
   end
+
+  scope "/", News2PostWeb do
+    pipe_through [:browser, :require_authenticated_admin_user]
+
+    resources "/users", UserController
+  end
+
 
   scope "/", News2PostWeb do
     pipe_through [:browser]

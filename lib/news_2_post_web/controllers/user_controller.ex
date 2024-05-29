@@ -22,7 +22,6 @@ defmodule News2PostWeb.UserController do
         |> redirect(to: ~p"/users/#{user}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-      IO.puts("..... loi roi: #{inspect(changeset)}}")
 
         render(conn, :new, changeset: changeset, is_new: true)
     end
