@@ -104,13 +104,6 @@ defmodule News2PostWeb.Router do
   end
 
   scope "/", News2PostWeb do
-    pipe_through [:browser, :require_authenticated_admin_user]
-
-    resources "/users", UserController
-  end
-
-
-  scope "/", News2PostWeb do
     pipe_through [:browser]
 
     delete "/users/log_out", UserSessionController, :delete
@@ -119,4 +112,11 @@ defmodule News2PostWeb.Router do
     get "/users/confirm/:token", UserConfirmationController, :edit
     post "/users/confirm/:token", UserConfirmationController, :update
   end
+
+  scope "/", News2PostWeb do
+    pipe_through [:browser, :require_authenticated_admin_user]
+
+    resources "/users", UserController
+  end
+
 end
