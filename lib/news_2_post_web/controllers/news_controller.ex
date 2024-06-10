@@ -39,7 +39,7 @@ defmodule News2PostWeb.NewsController do
     }
     {:ok, request_data_json} = Jason.encode(request_data)
     project_root = :code.priv_dir(:news_2_post) |> Path.join("../../")
-    file_path = Path.join([project_root, "urls", "#{news.sk}.json"])
+    file_path = Path.join([project_root, "urls/input/waiting", "#{news.sk}.json"])
     File.mkdir_p!(Path.dirname(file_path))
     File.write(file_path, request_data_json)
 

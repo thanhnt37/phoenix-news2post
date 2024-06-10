@@ -20,7 +20,7 @@ defmodule News2Post.CRUD.Stats do
     |> validate_required([:pk, :sk, :today, :this_month, :this_quarter, :this_year])
   end
 
-  defimpl Phoenix.Param, for: News2Post.CRUD.News do
+  defimpl Phoenix.Param, for: News2Post.CRUD.Stats do
     def to_param(%{sk: sk}), do: sk
   end
 
