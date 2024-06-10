@@ -27,4 +27,28 @@ defmodule News2PostWeb.NewsController do
     )
   end
 
+  def re_write(conn, params) do
+    referer_url = Plug.Conn.get_req_header(conn, "referer")
+                  |> List.first()
+
+    news = CRUD.get_news_by_id(params["sk"])
+    request_data = %{
+      pk: news.pk,
+      sk: news.sk,
+      url: news.url
+    }
+    {:ok, request_data_json} = Jason.encode(request_data)
+    project_root = :code.priv_dir(:news_2_post) |> Path.join("../../")
+    file_path = Path.join([project_root, "urls", "#{news.sk}.json"])
+    File.mkdir_p!(Path.dirname(file_path))
+    File.write(file_path, request_data_json)
+
+    # TODO: validation
+    CRUD.update_news(news.sk, %{:status => "re_writing"})
+
+    conn
+    |> put_flash(:info, "Send request successfully.")
+    |> redirect(external: referer_url)
+  end
+
 end

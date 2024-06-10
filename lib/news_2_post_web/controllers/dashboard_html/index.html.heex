@@ -100,7 +100,7 @@
                             <span class="w-24 block text-center bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Publish</span>
                         </.link>
                     <% news.status == "raw" -> %>
-                        <.link href="#" method="put" data-confirm="Are you sure to re-write this News?">
+                        <.link href={~p"/news/#{news}/re-write"} method="put" data-confirm="Are you sure to re-write this News?">
                             <span class="w-24 block text-center min-w-fit bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Re-write</span>
                         </.link>
                     <% news.status == "reviewing" -> %>
