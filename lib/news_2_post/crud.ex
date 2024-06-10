@@ -112,6 +112,27 @@ defmodule News2Post.CRUD do
     Enum.at(records, 0)
   end
 
+  def update_news(sk, updated_data) do
+    update_expression = build_update_expression(updated_data)
+
+    expression_attribute_names = build_expression_attribute_names(updated_data)
+
+    expression_attribute_values = build_expression_attribute_values(updated_data)
+
+    primary_key = %{pk: "news", sk: sk}
+
+    update_item_params = %{
+      update_expression: update_expression,
+      expression_attribute_names: expression_attribute_names,
+      expression_attribute_values: expression_attribute_values,
+      return_values: :updated_new
+    }
+
+    Dynamo.update_item(@news_table_name, primary_key, update_item_params)
+    |> ExAws.request!()
+  end
+
+
   def delete_news(id, created_at) do
     Dynamo.delete_item(
       @news_table_name,
