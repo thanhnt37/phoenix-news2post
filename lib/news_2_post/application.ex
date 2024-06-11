@@ -17,7 +17,8 @@ defmodule News2Post.Application do
       # Start a worker by calling: News2Post.Worker.start_link(arg)
       # {News2Post.Worker, arg},
       # Start to serve requests, typically the last entry
-      News2PostWeb.Endpoint
+      News2PostWeb.Endpoint,
+      News2Post.Langchain
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
