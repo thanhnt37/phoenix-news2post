@@ -27,6 +27,38 @@ defmodule News2PostWeb.NewsController do
     )
   end
 
+  def new(conn, _params) do
+    render(conn, :new)
+  end
+
+  def create(conn, %{"url" => url}) do
+    referer_url = Plug.Conn.get_req_header(conn, "referer")
+                  |> List.first()
+
+    if valid_domain?(url) do
+      news_id = UUID.uuid1()
+      record = %{
+        "pk": "news",
+        "sk": news_id,
+        "url": url,
+        "status": "raw",
+        "created_at": DateTime.to_string(DateTime.utc_now()),
+      }
+      IO.puts("..... record: #{inspect(record, pretty: true)}")
+
+      CRUD.create_news(record)
+      news = CRUD.get_news_by_id(news_id)
+      conn
+      |> put_flash(:info, "Create News successfully")
+      |> redirect(to: ~p"/news/#{news}")
+    else
+      conn
+      |> put_flash(:error, "Please use posts from mynewsdesk.com")
+      |> redirect(external: referer_url)
+    end
+
+  end
+
   def show(conn, %{"sk" => sk}) do
     news = CRUD.get_news_by_id(sk)
 
@@ -55,6 +87,19 @@ defmodule News2PostWeb.NewsController do
     conn
     |> put_flash(:info, "Send request successfully.")
     |> redirect(external: referer_url)
+  end
+
+  defp valid_domain?(url) do
+    with %URI{host: host} <- URI.parse(url),
+         true <- host_valid?(host) do
+      true
+    else
+      _ -> false
+    end
+  end
+
+  defp host_valid?(host) when is_binary(host) do
+    String.ends_with?(host, "mynewsdesk.com")
   end
 
 end
