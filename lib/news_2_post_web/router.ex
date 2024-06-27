@@ -88,6 +88,7 @@ defmodule News2PostWeb.Router do
     get "/", DashboardController, :index
 
     get "/news", NewsController, :index
+    get "/news/:sk", NewsController, :show
     put "/news/:sk/re-write", NewsController, :re_write
 
     get "/posts", PostController, :index

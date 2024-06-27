@@ -27,6 +27,12 @@ defmodule News2PostWeb.NewsController do
     )
   end
 
+  def show(conn, %{"sk" => sk}) do
+    news = CRUD.get_news_by_id(sk)
+
+    render(conn, :show, news: news)
+  end
+
   def re_write(conn, params) do
     referer_url = Plug.Conn.get_req_header(conn, "referer")
                   |> List.first()

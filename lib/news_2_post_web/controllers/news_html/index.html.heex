@@ -24,7 +24,7 @@
 
 
 <div class="list-items min-h-[100px]">
-  <.table id="news" rows={@news_collection.items}>
+  <.table id="news" rows={@news_collection.items} row_click={&JS.navigate(~p"/news/#{&1}")}>
     <:col :let={news} label="ID"><%= news.sk %></:col>
     <:col :let={news} label="Title" class="w-80"><%= news.title %></:col>
     <:col :let={news} label="Description">
