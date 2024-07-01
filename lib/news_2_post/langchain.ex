@@ -32,12 +32,13 @@ defmodule News2Post.Langchain do
     Enum.each(files, fn file ->
       file_path = Path.join(@waiting_folder, file)
       news_id = Path.basename(file, ".json")
+      new_post_id = UUID.uuid1()
       file_content = File.read!(file_path)
       data = Jason.decode!(file_content)
       sections = Jason.encode!(data["sections"])
       record = %{
         "pk": "posts",
-        "sk": UUID.uuid1(),
+        "sk": new_post_id,
         "title": data["title"],
         "description": data["description"],
         "url": data["url"],
@@ -50,6 +51,16 @@ defmodule News2Post.Langchain do
 
       CRUD.create_post(record)
       move_file_to_processed_folder(file_path, file)
+
+      CRUD.update_news(
+        news_id,
+        %{
+          :title => data["title"],
+          :description => data["description"],
+          :status => "rewrote",
+          :post_id => new_post_id,
+        }
+      )
     end)
   end
 
