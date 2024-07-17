@@ -10,6 +10,7 @@ defmodule News2Post.Accounts.User do
 
     field :first_name, :string
     field :last_name, :string
+    field :configs, :string, default: ""
     field :role, :string, default: "user" # admin || user
 
     timestamps(type: :utc_datetime)
@@ -50,6 +51,11 @@ defmodule News2Post.Accounts.User do
     user
     |> cast(attrs, [:first_name, :last_name, :role])
     |> validate_role()
+  end
+
+  def user_configs_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:configs])
   end
 
   defp validate_email(changeset, opts) do

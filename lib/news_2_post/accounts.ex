@@ -361,6 +361,14 @@ defmodule News2Post.Accounts do
     |> Repo.update()
   end
 
+  def update_user_configs(user, attrs) do
+    IO.puts("........ attrs: #{inspect(attrs, pretty: true)}")
+
+    user
+    |> User.user_configs_changeset(attrs)
+    |> Repo.update()
+  end
+
   def delete_user(user) do
     Repo.delete(user)
   end

@@ -121,6 +121,9 @@ defmodule News2PostWeb.Router do
     pipe_through [:browser, :require_authenticated_admin_user]
 
     resources "/users", UserController
+
+    get "/configs", ConfigsController, :edit
+    put "/configs", ConfigsController, :update
   end
 
 end
