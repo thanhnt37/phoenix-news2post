@@ -77,13 +77,29 @@ defmodule News2PostWeb.PostController do
     referer_url = Plug.Conn.get_req_header(conn, "referer")
                   |> List.first()
 
-    post = CRUD.get_post_by_id(params["sk"])
-    # TODO: validation
-    CRUD.update_post(post.sk, %{:status => "published"})
+    user = conn.assigns[:current_user]
+    configs = if user.configs == "", do: "{}", else: user.configs
+    configs = JSON.decode!(configs)
+    if configs == %{} do
+      conn
+      |> put_flash(:error, "Missing WordPress configurations")
+      |> redirect(external: referer_url)
+    end
 
-    conn
-    |> put_flash(:info, "Post published successfully.")
-    |> redirect(external: referer_url)
+    case send_request_to_wp(configs) do
+      {:ok, body} ->
+        post = CRUD.get_post_by_id(params["sk"])
+        # TODO: validation
+        CRUD.update_post(post.sk, %{:status => "published"})
+        conn
+        |> put_flash(:info, "Post published successfully.")
+        |> redirect(external: referer_url)
+
+      {:error, reason} ->
+        conn
+        |> put_flash(:error, reason)
+        |> redirect(external: referer_url)
+    end
   end
 
   def delete(conn, %{"sk" => sk}) do
@@ -93,6 +109,36 @@ defmodule News2PostWeb.PostController do
     conn
     |> put_flash(:info, "Post deleted successfully.")
     |> redirect(to: ~p"/posts")
+  end
+
+  def send_request_to_wp(configs) do
+    endpoint = configs["endpoint"]
+    username = configs["username"]
+    password = configs["app_password"]
+    url = "#{endpoint}/wp-json/wp/v2/posts"
+    headers = [
+      {"Content-Type", "application/json"},
+      {"Authorization", basic_auth_header(username, password)}
+    ]
+    body = Jason.encode!(%{title: "foo", body: "bar", userId: 1})
+
+    case :hackney.request(:post, url, headers, body, [recv_timeout: 5000]) do
+      {:ok, status_code, _headers, client_ref} when status_code in 200..299 ->
+        {:ok, body} = :hackney.body(client_ref)
+        {:ok, body}
+
+      {:ok, status_code, _headers, client_ref} ->
+        {:ok, body} = :hackney.body(client_ref)
+        {:error, "Request failed with status code: #{status_code}."}
+
+      {:error, reason} ->
+        {:error, "Request failed with reason: #{reason}"}
+    end
+  end
+
+  defp basic_auth_header(username, password) do
+    encoded = Base.encode64("#{username}:#{password}")
+    "Basic #{encoded}"
   end
 
 end
