@@ -86,9 +86,9 @@ defmodule News2PostWeb.PostController do
       |> redirect(external: referer_url)
     end
 
-    case send_request_to_wp(configs) do
+    post = CRUD.get_post_by_id(params["sk"])
+    case send_request_to_wp(configs, post) do
       {:ok, body} ->
-        post = CRUD.get_post_by_id(params["sk"])
         # TODO: validation
         CRUD.update_post(post.sk, %{:status => "published"})
         conn
@@ -111,7 +111,7 @@ defmodule News2PostWeb.PostController do
     |> redirect(to: ~p"/posts")
   end
 
-  def send_request_to_wp(configs) do
+  def send_request_to_wp(configs, post) do
     endpoint = configs["endpoint"]
     username = configs["username"]
     password = configs["app_password"]
@@ -120,7 +120,11 @@ defmodule News2PostWeb.PostController do
       {"Content-Type", "application/json"},
       {"Authorization", basic_auth_header(username, password)}
     ]
-    body = Jason.encode!(%{title: "foo", body: "bar", userId: 1})
+    body = Jason.encode!(%{
+      title: post.title,
+      content: post.title,
+      status: "publish"
+    })
 
     case :hackney.request(:post, url, headers, body, [recv_timeout: 5000]) do
       {:ok, status_code, _headers, client_ref} when status_code in 200..299 ->
