@@ -108,9 +108,18 @@
                             <span class="w-24 block text-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Approve</span>
                         </.link>
                     <% news.status == "published" -> %>
-                        <span class="text-violet-600"><%= news.status %></span>
+                        <span class="text-violet-600">Published</span>
                     <% true -> %>
-                        <span><%= news.status %></span>
+                        <span>
+                            <%= case news.status do %>
+                              <% "re_writing" -> %>
+                                Re-Writing
+                              <% "rewrote" -> %>
+                                Re-Written
+                              <% _ -> %>
+                                Unknown Status
+                            <% end %>
+                        </span>
                 <% end %>
             </:col>
         </.table>

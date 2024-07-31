@@ -57,7 +57,18 @@
     </:item>
     <:item title="Title"><%= @news.title %></:item>
     <:item title="Description"><%= @news.description %></:item>
-    <:item title="Status"><%= @news.status %></:item>
+    <:item title="Status">
+        <%= case @news.status do %>
+            <% "raw" -> %>
+                Raw
+            <% "re_writing" -> %>
+                Re-Writing
+            <% "rewrote" -> %>
+                Re-Written
+            <% _ -> %>
+                Unknown Status
+        <% end %>
+    </:item>
 
     <:item title="Result">
         <%= if Map.has_key?(@news, :post_id) and @news.post_id != nil do %>

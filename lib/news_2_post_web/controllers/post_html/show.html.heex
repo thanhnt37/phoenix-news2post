@@ -68,7 +68,18 @@
       Unknown
     <% end %>
   </:item>
-  <:item title="Status"><%= @post.status %></:item>
+  <:item title="Status">
+      <%= case @post.status do %>
+          <% "reviewing" -> %>
+              Reviewing
+          <% "approved" -> %>
+              Approved
+          <% "published" -> %>
+              Published
+          <% _ -> %>
+              Unknown Status
+      <% end %>
+  </:item>
   <:item title="Title"><%= @post.title %></:item>
   <:item title="Description"><%= @post.description %></:item>
   <:item title="Sections">
