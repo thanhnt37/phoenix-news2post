@@ -120,10 +120,14 @@ defmodule News2PostWeb.PostController do
       {"Content-Type", "application/json"},
       {"Authorization", basic_auth_header(username, password)}
     ]
+    sections = JSON.decode!(post.sections)
+    post_content = sections
+                   |> Enum.map(fn %{"heading" => heading, "text" => text} -> "<h2>#{heading}</h2> <p>#{text}</p>" end)
+                   |> Enum.join(" ")
     body = Jason.encode!(%{
       title: post.title,
-      content: post.title,
-      status: "publish"
+      content: post_content,
+      status: "draft"
     })
 
     case :hackney.request(:post, url, headers, body, [recv_timeout: 5000]) do
