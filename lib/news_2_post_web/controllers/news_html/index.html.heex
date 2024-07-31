@@ -31,7 +31,9 @@
 
 <div class="list-items min-h-[100px]">
   <.table id="news" rows={@news_collection.items} row_click={&JS.navigate(~p"/news/#{&1}")}>
-    <:col :let={news} label="ID"><%= news.sk %></:col>
+    <:col :let={news} label="ID">
+      <span style="display:block; width: 75px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.sk %></span>
+    </:col>
     <:col :let={news} label="Title" class="w-80"><%= news.title %></:col>
     <:col :let={news} label="Description">
       <span style="display:block; width: 370px; height: 70px; overflow: hidden; text-overflow: ellipsis;"><%= news.description %></span>

@@ -87,9 +87,17 @@
 
     <div class="mt-10">
         <.table id="news" rows={@news_collection}>
-            <:col :let={news} label="ID"><%= news.sk %></:col>
+            <:col :let={news} label="ID">
+                <span style="display:block; width: 75px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.sk %></span>
+            </:col>
             <:col :let={news} label="Source">
-                <span style="display:block; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.url %></span>
+                <%= if news.url != nil do %>
+                    <a href={news.url} target="_blank">
+                        <span style="display:block; width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.url %></span>
+                    </a>
+                <% else %>
+                    Unknown
+                <% end %>
             </:col>
             <:col :let={news} label="Title" class="w-80"><%= news.title %></:col>
 

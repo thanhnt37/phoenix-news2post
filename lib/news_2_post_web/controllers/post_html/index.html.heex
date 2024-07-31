@@ -32,16 +32,20 @@
 
 <div class="list-items min-h-[100px]">
   <.table id="posts" rows={@posts.items} row_click={&JS.navigate(~p"/posts/#{&1}")}>
-    <:col :let={post} label="ID"><%= post.sk %></:col>
+    <:col :let={post} label="ID">
+      <span style="display:block; width: 75px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= post.sk %></span>
+    </:col>
     <:col :let={post} label="Title" class="w-80"><%= post.title %></:col>
     <:col :let={post} label="Description"><%= post.description %></:col>
 
     <:col :let={post} label="Status">
       <%= cond do %>
         <% post.status == "approved" -> %>
-          <span class="text-green-600"><%= post.status %></span>
+          <span class="text-green-600">Approved</span>
         <% post.status == "published" -> %>
-          <span class="text-violet-600"><%= post.status %></span>
+          <span class="text-violet-600">Published</span>
+        <% post.status == "reviewing" -> %>
+          <span>Reviewing</span>
         <% true -> %>
           <span><%= post.status %></span>
       <% end %>
