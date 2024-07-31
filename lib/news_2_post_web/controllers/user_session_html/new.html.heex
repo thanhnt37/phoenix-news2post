@@ -9,8 +9,8 @@
   <.simple_form :let={f} for={@conn.params["user"]} as={:user} action={~p"/users/log_in"}>
     <.error :if={@error_message}><%= @error_message %></.error>
 
-    <.input field={f[:email]} type="email" label="Email" required value="test@adabeat.com" />
-    <.input field={f[:password]} type="password" label="Password" required value="Test@AdaBeat123" />
+    <.input field={f[:email]} type="email" label="Email" required placeholder="Please enter a valid email address" />
+    <.input field={f[:password]} type="password" label="Password" required placeholder="Your password" />
 
     <:actions>
       <.button phx-disable-with="Signing in..." class="w-full bg-zinc-900">
