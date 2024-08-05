@@ -104,7 +104,11 @@ defmodule News2PostWeb.PostController do
 
   def delete(conn, %{"sk" => sk}) do
     post = CRUD.get_post_by_id(sk)
+    IO.puts("............. deleting post_id: #{sk}")
     CRUD.delete_post(post.sk)
+    news_id = post.news_id
+    IO.puts("............. deleting news_id: #{news_id}")
+    CRUD.update_news(news_id, %{:status => "raw"})
 
     conn
     |> put_flash(:info, "Post deleted successfully.")

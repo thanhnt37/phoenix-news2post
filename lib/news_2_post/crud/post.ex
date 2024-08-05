@@ -8,8 +8,9 @@ defmodule News2Post.CRUD.Post do
     field :title, :string
     field :description, :string
     field :sections, :string
-    field :status, :string  # raw || reviewing || approved || published
+    field :status, :string  # reviewing || approved || published
     field :url, :string
+    field :news_id, :string
 
     timestamps(type: :utc_datetime, inserted_at: :created_at, updated_at: :updated_at)
   end
