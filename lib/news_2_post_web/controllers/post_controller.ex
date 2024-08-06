@@ -31,6 +31,12 @@ defmodule News2PostWeb.PostController do
 
   def show(conn, %{"sk" => sk}) do
     post = CRUD.get_post_by_id(sk)
+    if post == nil do
+      conn
+      |> put_flash(:error, "Post does not exist!")
+      |> redirect(to: ~p"/posts")
+    end
+
     sections = JSON.decode!(post.sections)
 
     render(conn, :show, post: post, sections: sections)
