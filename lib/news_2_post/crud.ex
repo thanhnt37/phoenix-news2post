@@ -191,8 +191,9 @@ defmodule News2Post.CRUD do
     opts = %{
       limit: limit,
       expression_attribute_values: %{"pk" => "posts"},
-      expression_attribute_names: %{"#pk" => "pk"},
-      key_condition_expression: "#pk = :pk"
+      expression_attribute_names: %{"#pk" => "pk", "#deleted_at" => "deleted_at"},
+      key_condition_expression: "#pk = :pk",
+      filter_expression: "attribute_not_exists(#deleted_at)"
     }
 
     opts =
@@ -200,7 +201,7 @@ defmodule News2Post.CRUD do
         filter = %{
           expression_attribute_values: Map.put(opts.expression_attribute_values, "status", status),
           expression_attribute_names: Map.put(opts.expression_attribute_names, "#status", "status"),
-          filter_expression: "#status = :status"
+          filter_expression: "#status = :status AND attribute_not_exists(#deleted_at)"
         }
         Map.merge(opts, filter)
       else
@@ -242,11 +243,7 @@ defmodule News2Post.CRUD do
   end
 
   def delete_post(id) do
-    Dynamo.delete_item(
-      @posts_table_name,
-      %{pk: "posts", sk: id}
-    )
-    |> ExAws.request!
+    update_post(id, %{:deleted_at => DateTime.to_string(DateTime.utc_now())})
   end
 
   # ## Parameters

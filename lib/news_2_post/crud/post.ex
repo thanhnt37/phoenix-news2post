@@ -11,6 +11,7 @@ defmodule News2Post.CRUD.Post do
     field :status, :string  # reviewing || approved || published
     field :url, :string
     field :news_id, :string
+    field :deleted_at, :string
 
     timestamps(type: :utc_datetime, inserted_at: :created_at, updated_at: :updated_at)
   end
