@@ -36,8 +36,7 @@ defmodule News2PostWeb.PostController do
       |> put_flash(:error, "Post does not exist!")
       |> redirect(to: ~p"/posts")
     end
-
-    sections = JSON.decode!(post.sections)
+    sections = post.sections && JSON.decode!(post.sections) || []
 
     render(conn, :show, post: post, sections: sections)
   end
