@@ -1,55 +1,55 @@
 <div class="dashboard-index">
     <div class="flex justify-between">
-        <div class="bg-cyan-600 w-fit rounded-[25px] p-8 aspect hover:cursor-pointer" onclick="window.location.href = '/news'">
-            <p class="m-0  tracking-widest font-bold text-2xl"><%= @formatted_date %></p>
+        <div class="bg-cyan-600 rounded-[25px] p-8 px-12 aspect hover:cursor-pointer" onclick="window.location.href = '/news'">
+            <p class="m-0  tracking-widest font-bold text-2xl">News Stats</p>
             <table class="mt-3">
                 <tbody>
                 <tr>
-                    <td class="w-20 text-slate-700">Today:</td>
+                    <td class="w-24 text-slate-700">Today:</td>
                     <td class="m-0 tracking-widest text-lg"><%= @news_stats.today %> items</td>
                 </tr>
                 <tr>
-                    <td class="w-20 text-slate-700">Month:</td>
+                    <td class="w-24 text-slate-700">Month:</td>
                     <td class="m-0 tracking-widest text-lg"><%= @news_stats.this_month %> items</td>
                 </tr>
                 <tr>
-                    <td class="w-20 text-slate-700">Quarter:</td>
+                    <td class="w-24 text-slate-700">Quarter:</td>
                     <td class="m-0 tracking-widest text-lg"><%= @news_stats.this_quarter %> items</td>
                 </tr>
                 <tr>
-                    <td class="w-20 text-slate-700">Year:</td>
+                    <td class="w-24 text-slate-700">Year:</td>
                     <td class="m-0 tracking-widest text-lg"><%= @news_stats.this_year %> items</td>
                 </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="bg-cyan-600 w-fit rounded-[25px] p-8 aspect">
-            <p class="m-0  tracking-widest font-bold text-2xl">Number of re-written</p>
+        <div class="bg-cyan-600 rounded-[25px] p-8 px-12 aspect">
+            <p class="m-0  tracking-widest font-bold text-2xl">Post Stats</p>
             <table class="mt-3">
                 <tbody>
                 <tr>
-                    <td class="w-20 text-slate-700">Today:</td>
+                    <td class="w-24 text-slate-700">Today:</td>
                     <td class="m-0 tracking-widest text-lg"><%= @posts_stats.today %> items</td>
                 </tr>
                 <tr>
-                    <td class="w-20 text-slate-700">Month:</td>
+                    <td class="w-24 text-slate-700">Month:</td>
                     <td class="m-0 tracking-widest text-lg"><%= @posts_stats.this_month %> items</td>
                 </tr>
                 <tr>
-                    <td class="w-20 text-slate-700">Quarter:</td>
+                    <td class="w-24 text-slate-700">Quarter:</td>
                     <td class="m-0 tracking-widest text-lg"><%= @posts_stats.this_quarter %> items</td>
                 </tr>
                 <tr>
-                    <td class="w-20 text-slate-700">Year:</td>
+                    <td class="w-24 text-slate-700">Year:</td>
                     <td class="m-0 tracking-widest text-lg"><%= @posts_stats.this_year %> items</td>
                 </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="bg-cyan-600 w-fit rounded-[25px] p-8 aspect hover:cursor-pointer" onclick="window.location.href = '/posts'">
-            <p class="m-0 tracking-widest font-bold text-2xl">Latest re-written</p>
+        <div class="bg-cyan-600 rounded-[25px] p-8 px-12 aspect hover:cursor-pointer" onclick="window.location.href = '/posts'">
+            <p class="m-0 tracking-widest font-bold text-2xl">Latest Posts</p>
             <table class="mt-3 ">
                 <tbody>
                 <tr>
