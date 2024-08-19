@@ -41,16 +41,18 @@
     <:col :let={news} label="Published At">
       <span style="display:block; width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; "><%= news.published_at %></span>
     </:col>
-    <:col :let={news} label="Actions">
-      <span style="display:block; width: 85px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="text-lime-600">
-        <a href={news.url} target="_blank">View Source</a>
-      </span>
+    <:action :let={news} label="Actions">
+      <a href={news.url} target="_blank" class="p-2">
+        <span style="display:block; width: 85px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" class="text-lime-600">
+          View Source
+        </span>
+      </a>
       <%= if news.status == "raw" do %>
         <.link href={~p"/news/#{news}/re-write"} method="put" data-confirm="Are you sure to re-write this News?">
           <span class="w-24 block text-center min-w-fit bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">Re-write</span>
         </.link>
       <% end %>
-    </:col>
+    </:action>
   </.table>
 
   <%= if @news_collection.count == 0 do %>
