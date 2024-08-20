@@ -48,6 +48,19 @@ defmodule News2PostWeb.NewsController do
 
       CRUD.create_news(record)
       news = CRUD.get_news_by_id(news_id)
+
+      # push to queue, crawling and update news info
+      request_data = %{
+        pk: news.pk,
+        sk: news.sk,
+        url: news.url
+      }
+      {:ok, request_data_json} = Jason.encode(request_data)
+      project_root = :code.priv_dir(:news_2_post) |> Path.join("../../")
+      file_path = Path.join([project_root, "urls/scrapy/waiting", "#{news.sk}.json"])
+      File.mkdir_p!(Path.dirname(file_path))
+      File.write(file_path, request_data_json)
+
       conn
       |> put_flash(:info, "Create News successfully")
       |> redirect(to: ~p"/news/#{news}")
