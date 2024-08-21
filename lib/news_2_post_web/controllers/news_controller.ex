@@ -75,8 +75,23 @@ defmodule News2PostWeb.NewsController do
 
   def show(conn, %{"sk" => sk}) do
     news = CRUD.get_news_by_id(sk)
+    progress =
+      if news.status == "creating" do
+        calculate_progress_bar(news.created_at)
+      else
+        "Unknown"
+      end
 
-    render(conn, :show, news: news)
+    render(conn, :show, news: news, progress: progress)
+  end
+
+  defp calculate_progress_bar(created_at) do
+    current_time = DateTime.utc_now()
+    {:ok, created_at, _offset} = DateTime.from_iso8601(created_at)
+    time_difference_in_seconds = DateTime.diff(current_time, created_at)
+    times_elapsed = div(time_difference_in_seconds, 5)
+    progress = min(times_elapsed * 3, 97)
+    progress = "#{progress}%"
   end
 
   def re_write(conn, params) do
