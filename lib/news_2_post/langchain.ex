@@ -5,6 +5,7 @@ defmodule News2Post.Langchain do
 
   @waiting_folder "../urls/dynamodb/waiting"
   @processed_folder "../urls/dynamodb/processed"
+  @tmp_folder "../urls/dynamodb/tmp"
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -61,6 +62,33 @@ defmodule News2Post.Langchain do
           :post_id => new_post_id,
         }
       )
+    end)
+
+    handle_tmp_message()
+  end
+
+  defp handle_tmp_message() do
+    files = File.ls!(@tmp_folder)
+            |> Enum.filter(&String.ends_with?(&1, ".json"))
+
+    Enum.each(files, fn file ->
+      file_path = Path.join(@tmp_folder, file)
+      IO.puts("..... handle tmp message: #{file_path}")
+      news_id = Path.basename(file, ".json")
+      file_content = File.read!(file_path)
+      data = Jason.decode!(file_content)
+      CRUD.update_news(
+        news_id,
+        %{
+          :title => data["title"],
+          :description => data["first_paragraph"],
+          :published_at => data["published_date"],
+          "status": "raw",
+          "progress": "100%",
+        }
+      )
+
+      File.rm(file_path)
     end)
   end
 
