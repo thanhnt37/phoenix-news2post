@@ -8,7 +8,8 @@ defmodule News2Post.CRUD.News do
     field :title, :string
     field :description, :string
     field :url, :string
-    field :status, :string  # raw || re_writing || rewrote
+    field :status, :string  # creating | raw || re_writing || rewrote
+    field :progress, :string  # 25%
     field :published_at, :date
     field :post_id, :string
 
@@ -18,7 +19,7 @@ defmodule News2Post.CRUD.News do
   @doc false
   def changeset(news, attrs) do
     news
-    |> cast(attrs, [:title, :description, :url, :status, :published_at])
+    |> cast(attrs, [:title, :description, :url, :status, :progress, :published_at])
     |> validate_required([:title, :description, :url, :published_at])
   end
 

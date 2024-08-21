@@ -41,13 +41,14 @@ defmodule News2PostWeb.NewsController do
         "pk": "news",
         "sk": news_id,
         "url": url,
-        "status": "raw",
+        "status": "creating",
+        "progress": "15%",
         "created_at": DateTime.to_string(DateTime.utc_now()),
       }
-      IO.puts("..... record: #{inspect(record, pretty: true)}")
 
       CRUD.create_news(record)
       news = CRUD.get_news_by_id(news_id)
+      IO.puts("..... news: #{inspect(news, pretty: true)}")
 
       # push to queue, crawling and update news info
       request_data = %{

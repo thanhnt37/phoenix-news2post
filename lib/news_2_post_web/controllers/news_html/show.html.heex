@@ -59,6 +59,8 @@
     <:item title="Description"><%= @news.description %></:item>
     <:item title="Status">
         <%= case @news.status do %>
+            <% "creating" -> %>
+                Creating
             <% "raw" -> %>
                 Raw
             <% "re_writing" -> %>
@@ -77,7 +79,11 @@
             <%= if @news.status == "re_writing" do %>
                 Processing
             <% else %>
-                Unknown
+                <%= if @news.status == "creating" do %>
+                    <%= @news.progress %>
+                <% else %>
+                    Unknown
+                <% end %>
             <% end %>
         <% end %>
     </:item>
