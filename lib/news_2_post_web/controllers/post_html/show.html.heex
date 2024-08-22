@@ -33,12 +33,15 @@
     <div class="flex-none">
         <%= cond do %>
           <% @post.status == "reviewing" -> %>
-            <.link href={~p"/posts/#{@post}/edit"}>
-                <.button class="bg-yellow-600 mr-2">Edit post</.button>
-            </.link>
-            <.link href={~p"/posts/#{@post}/approve"} method="put" data-confirm="Are you sure you want to approve this post?">
-                <.button class="bg-green-600">Approve</.button>
-            </.link>
+            <%= if @sections != [] do %>
+                <.link href={~p"/posts/#{@post}/edit"}>
+                    <.button class="bg-yellow-600 mr-2">Edit post</.button>
+                </.link>
+                <.link href={~p"/posts/#{@post}/approve"} method="put" data-confirm="Are you sure you want to approve this post?">
+                    <.button class="bg-green-600">Approve</.button>
+                </.link>
+            <% end %>
+
             <.link href={~p"/posts/#{@post}"} method="delete" data-confirm="Are you sure?">
                 <.button class="bg-red-600">Delete</.button>
             </.link>
@@ -89,6 +92,9 @@
         <p><%= section["text"] %></p>
       </div>
     <% end %>
+      <%= if @sections == [] do %>
+        <p class="text-slate-500">Sorry !!! <br /> Something went wrong with this post. You can delete this post and re-write news again</p>
+      <% end %>
   </:item>
 </.list>
 
