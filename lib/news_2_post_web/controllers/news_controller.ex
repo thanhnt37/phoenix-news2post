@@ -79,7 +79,11 @@ defmodule News2PostWeb.NewsController do
       if news.status == "creating" do
         calculate_progress_bar(news.created_at)
       else
-        "Unknown"
+        if news.status == "re_writing" do
+          calculate_progress_bar(news.updated_at)
+        else
+          "Unknown"
+        end
       end
 
     render(conn, :show, news: news, progress: progress)
@@ -107,7 +111,11 @@ defmodule News2PostWeb.NewsController do
     case File.cp(source_path, destination_path) do
       :ok ->
         # TODO: validation
-        CRUD.update_news(news.sk, %{:status => "re_writing"})
+        CRUD.update_news(news.sk, %{
+          :status => "re_writing",
+          :progress => "5%",
+          :updated_at => DateTime.to_string(DateTime.utc_now())
+        })
         conn
         |> put_flash(:info, "Send request successfully.")
         |> redirect(external: referer_url)

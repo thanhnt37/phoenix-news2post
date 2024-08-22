@@ -43,7 +43,7 @@ defmodule News2PostWeb.PostController do
 
   def edit(conn, %{"sk" => sk}) do
     post = CRUD.get_post_by_id(sk)
-    sections = JSON.decode!(post.sections)
+    sections = post.sections && JSON.decode!(post.sections) || []
 
     render(conn, :edit, post: post, sections: sections)
   end

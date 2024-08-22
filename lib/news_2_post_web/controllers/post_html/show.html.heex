@@ -71,6 +71,13 @@
       Unknown
     <% end %>
   </:item>
+  <:item title="News ID">
+    <%= if @post.news_id != nil do %>
+      <a href={~p"/news/#{@post.news_id}"} target="_blank"><%= @post.news_id %></a>
+    <% else %>
+      Unknown
+    <% end %>
+  </:item>
   <:item title="Status">
       <%= case @post.status do %>
           <% "reviewing" -> %>

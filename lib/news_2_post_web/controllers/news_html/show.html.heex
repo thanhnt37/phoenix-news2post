@@ -73,15 +73,17 @@
     </:item>
 
     <:item title="Result">
-        <%= if Map.has_key?(@news, :post_id) and @news.post_id != nil do %>
+        <%= if @news.status == "rewrote" and Map.has_key?(@news, :post_id) and @news.post_id != nil do %>
             <a href={~p"/posts/#{@news.post_id}"} target="_blank">Post ID: <%= @news.post_id %></a>
         <% else %>
             <%= if @news.status == "re_writing" do %>
-                Processing
+                <div class="w-80 bg-gray-200 rounded-full dark:bg-gray-700">
+                    <div class="bg-cyan-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style={"width: #{@progress}"}><%= @progress %></div>
+                </div>
             <% else %>
                 <%= if @news.status == "creating" do %>
                     <div class="w-80 bg-gray-200 rounded-full dark:bg-gray-700">
-                        <div class="bg-cyan-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style={"width: #{@progress}%"}><%= @progress %></div>
+                        <div class="bg-cyan-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style={"width: #{@progress}"}><%= @progress %></div>
                     </div>
                 <% else %>
                     Unknown
