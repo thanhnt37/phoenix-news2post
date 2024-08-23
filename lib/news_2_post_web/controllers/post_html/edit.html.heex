@@ -33,7 +33,7 @@
   <div class="flex-none">
     <%= if @post.status == "reviewing" do %>
       <.link href={~p"/posts/#{@post}"}>
-        <.button class="bg-slate-600 mr-2">Cancel</.button>
+        <.button class="bg-slate-600 mr-2 px-6 py-1">Cancel</.button>
       </.link>
   <% end %>
   </div>
@@ -59,18 +59,62 @@
     <textarea id="description" name="post[description]" class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6m,phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400 min-h-[6rem]"><%= @post.description %></textarea>
   </div>
 
-  <%= @sections |> Enum.with_index() |> Enum.map(fn {section, index}  -> %>
-  <div phx-feedback-for="post[sections][]" class="mt-5">
-    <label for="post_sections_0" class="block text-sm font-semibold leading-6 text-zinc-800">Section <%= index + 1 %></label>
-    <input type="text" name={"post[sections][" <> Integer.to_string(index) <> "][heading]"} id="post_sections_0_heading" placeholder={"Heading for Section " <> Integer.to_string(index + 1)} value={section["heading"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
-    <textarea name={"post[sections][" <> Integer.to_string(index) <> "][text]"} id="post_sections_0_text" placeholder={"Content for Section " <> Integer.to_string(index + 1)}                                           class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6m,phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400 min-h-[6rem]"><%= section["text"] %></textarea>
-  </div>
-  <% end) %>
+  <div id="sections-container">
+    <%= @sections |> Enum.with_index() |> Enum.map(fn {section, index}  -> %>
+    <div phx-feedback-for="post[sections][]" class="mt-8 py-4 border-t" id={"section-#{index}"}>
+      <label for="post_sections_0" class="flex items-center justify-between text-sm font-semibold leading-6 text-zinc-800 hover:bg-gray-100">
+        Section <%= index + 1 %>
+        <button type="button" onclick={"removeSection(" <> Integer.to_string(index) <> ")"} class="bg-slate-400 hover:bg-red-600 text-white rounded px-6 py-1">Remove</button>
+      </label>
 
-  <div class="mt-2 flex items-center justify-between gap-6">
-    <button type="submit" class="phx-submit-loading:opacity-75 rounded-lg hover:bg-zinc-700 py-2 px-3 text-sm font-semibold leading-6 text-white active:text-white/80 bg-green-600">Save Post</button>
+      <input required type="text" name={"post[sections][" <> Integer.to_string(index) <> "][heading]"} id="post_sections_0_heading" placeholder={"Heading for Section " <> Integer.to_string(index + 1)} value={section["heading"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
+      <textarea required name={"post[sections][" <> Integer.to_string(index) <> "][text]"} id="post_sections_0_text" placeholder={"Content for Section " <> Integer.to_string(index + 1)}                                           class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6m,phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400 min-h-[6rem]"><%= section["text"] %></textarea>
+    </div>
+    <% end) %>
+  </div>
+
+  <div class="mt-4">
+    <button type="button" onclick="addSection()" class="bg-blue-600 text-white rounded text-sm px-6 py-1">New Section</button>
+  </div>
+
+  <div class="mt-10 pt-6 flex items-center justify-between gap-6 border-t">
+    <button type="submit" class="phx-submit-loading:opacity-75 rounded-lg hover:bg-zinc-700 py-2 px-10 font-semibold leading-6 text-white active:text-white/80 bg-green-600">Save All Changes</button>
   </div>
 </form>
 
 
 <.back navigate={~p"/posts"}>Back to posts</.back>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let sectionIndex = <%= length(@sections) %>;
+
+    window.addSection = function () {
+      const container = document.getElementById("sections-container");
+
+      const newSection = document.createElement("div");
+      newSection.classList.add("mt-5", "section");
+      newSection.id = `section-${sectionIndex}`;
+
+      newSection.innerHTML = `
+      <label for="post_sections_0" class="flex items-center justify-between text-sm font-semibold leading-6 text-zinc-800 hover:bg-gray-100">
+        Section ${sectionIndex + 1}
+        <button type="button" onclick="removeSection(${sectionIndex})" class="bg-slate-400 hover:bg-red-600 text-white rounded px-6 py-1">Remove</button>
+      </label>
+      <input required type="text" name="post[sections][${sectionIndex}][heading]" placeholder="Heading for Section ${sectionIndex + 1}" class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
+      <textarea required name="post[sections][${sectionIndex}][text]" placeholder="Content for Section ${sectionIndex + 1}" class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400 min-h-[6rem]"></textarea>
+    `;
+
+      container.appendChild(newSection);
+      sectionIndex++;
+    };
+
+    window.removeSection = function (index) {
+      const section = document.getElementById(`section-${index}`);
+      if (section) {
+        section.remove();
+      }
+    };
+  });
+
+</script>
