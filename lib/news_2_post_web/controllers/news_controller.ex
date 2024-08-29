@@ -36,7 +36,7 @@ defmodule News2PostWeb.NewsController do
                   |> List.first()
 
     if valid_domain?(url) do
-      news_id = UUID.uuid1()
+      news_id = DateTime.utc_now() |> DateTime.to_unix(:millisecond)|> Integer.to_string()
       record = %{
         "pk": "news",
         "sk": news_id,

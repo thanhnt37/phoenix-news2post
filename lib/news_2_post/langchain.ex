@@ -33,7 +33,7 @@ defmodule News2Post.Langchain do
     Enum.each(files, fn file ->
       file_path = Path.join(@waiting_folder, file)
       news_id = Path.basename(file, ".json")
-      new_post_id = UUID.uuid1()
+      new_post_id = DateTime.utc_now() |> DateTime.to_unix(:millisecond)|> Integer.to_string()
       file_content = File.read!(file_path)
       data = Jason.decode!(file_content)
       sections = Jason.encode!(data["sections"])
