@@ -20,11 +20,16 @@ defmodule News2PostWeb.NewsController do
         JSON.encode!(news.previous_key)
       end
 
-    render(conn, :index,
-      news_collection: news,
-      last_evaluated_key: JSON.encode!(last_evaluated_key), page_type: page_type,
-      next_key: JSON.encode!(news.next_key), previous_key: previous_key
-    )
+    if news.count == 0 && page_type == "previous" do
+      conn
+      |> redirect(to: ~p"/news")
+    else
+      render(conn, :index,
+        news_collection: news,
+        page_type: page_type,
+        next_key: JSON.encode!(news.next_key), previous_key: previous_key
+      )
+    end
   end
 
   def new(conn, _params) do

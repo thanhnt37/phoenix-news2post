@@ -378,9 +378,10 @@ defmodule News2Post.CRUD do
           %{}
         end
       else
+        last_item = Enum.at(items, -1)
         %{
-          pk: last_key.pk,
-          sk: last_key.sk
+          pk: last_item.pk,
+          sk: last_item.sk
         }
       end
 
