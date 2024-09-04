@@ -85,26 +85,45 @@ defmodule News2PostWeb.PostController do
     user = conn.assigns[:current_user]
     configs = if user.configs == "", do: "{}", else: user.configs
     configs = JSON.decode!(configs)
-    if configs == %{} do
+    integration_type = Map.get(configs, "integration_type", "")
+    if configs == %{} || integration_type == "" do
       conn
-      |> put_flash(:error, "Missing WordPress configurations")
+      |> put_flash(:error, "Missing CMS Platform configurations!")
       |> redirect(external: referer_url)
     end
 
     post = CRUD.get_post_by_id(params["sk"])
-    case send_request_to_wp(configs, post) do
-      {:ok, body} ->
-        # TODO: validation
-        CRUD.update_post(post.sk, %{:status => "published"})
-        conn
-        |> put_flash(:info, "Post published successfully.")
-        |> redirect(external: referer_url)
-
-      {:error, reason} ->
-        conn
-        |> put_flash(:error, reason)
-        |> redirect(external: referer_url)
+    if integration_type == "wordpress" do
+      case send_request_to_wordpress(configs, post) do
+        {:ok, body} ->
+          CRUD.update_post(post.sk, %{:status => "published"})
+          conn
+          |> put_flash(:info, "Post published to WordPress successfully.")
+          |> redirect(external: referer_url)
+        {:error, reason} ->
+          conn
+          |> put_flash(:error, reason)
+          |> redirect(external: referer_url)
+      end
+    else
+      if integration_type == "webflow" do
+        case send_request_to_webflow(configs, post) do
+          {:ok, body} ->
+            CRUD.update_post(post.sk, %{:status => "published"})
+            conn
+            |> put_flash(:info, "Post published to WebFlow successfully.")
+            |> redirect(external: referer_url)
+          {:error, reason} ->
+            conn
+            |> put_flash(:error, reason)
+            |> redirect(external: referer_url)
+        end
+      end
     end
+
+    conn
+    |> put_flash(:error, "Bad request parameters.")
+    |> redirect(external: referer_url)
   end
 
   def delete(conn, %{"sk" => sk}) do
@@ -120,10 +139,46 @@ defmodule News2PostWeb.PostController do
     |> redirect(to: ~p"/posts")
   end
 
-  def send_request_to_wp(configs, post) do
-    endpoint = configs["endpoint"]
-    username = configs["username"]
-    password = configs["app_password"]
+  defp send_request_to_webflow(configs, post) do
+    token = configs["webflow"]["token"]
+    collection_id = configs["webflow"]["collection_id"]
+    url = "https://api.webflow.com/v2/collections/#{collection_id}/items"
+    headers = [
+      {"Content-Type", "application/json"},
+      {"Authorization", "Bearer #{token}"}
+    ]
+    sections = JSON.decode!(post.sections)
+    post_content = sections
+                   |> Enum.map(fn %{"heading" => heading, "text" => text} -> "<h2>#{heading}</h2> <p>#{text}</p>" end)
+                   |> Enum.join(" ")
+    body = Jason.encode!(%{
+      isArchived: false,
+      isDraft: true,
+      fieldData: %{
+        "name": post.title,
+        "post-body": post_content,
+        "post-summary": post.description,
+      }
+    })
+
+    case :hackney.request(:post, url, headers, body, [recv_timeout: 5000]) do
+      {:ok, status_code, _headers, client_ref} when status_code in 200..299 ->
+        {:ok, body} = :hackney.body(client_ref)
+        {:ok, body}
+
+      {:ok, status_code, _headers, client_ref} ->
+        {:ok, body} = :hackney.body(client_ref)
+        {:error, "Request failed with status code: #{status_code}."}
+
+      {:error, reason} ->
+        {:error, "Request failed with reason: #{reason}"}
+    end
+  end
+
+  defp send_request_to_wordpress(configs, post) do
+    endpoint = configs["wordpress"]["endpoint"]
+    username = configs["wordpress"]["username"]
+    password = configs["wordpress"]["app_password"]
     url = "#{endpoint}/wp-json/wp/v2/posts"
     headers = [
       {"Content-Type", "application/json"},
