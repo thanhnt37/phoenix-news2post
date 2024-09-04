@@ -23,27 +23,79 @@
     </div>
 </header>
 
-<div class="relative mt-10 p-10 border rounded-xl">
+<div class="mt-5">
+    <div>
+        <label for="integration_type" class="block text-sm font-semibold leading-6 text-zinc-800">CMS Platform</label>
+        <select id="integration_type" name="integration_type" class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm">
+            <option value="wordpress" selected={@configs["integration_type"] == "wordpress"}>WordPress</option>
+            <option value="webflow" selected={@configs["integration_type"] == "webflow"}>WebFlow</option>
+        </select>
+    </div>
+    <p class="text-sm text-gray-500 mt-3 block">
+        Please select the platform where you want to publish articles.
+    </p>
+</div>
+
+<div id="form_webflow" class={"relative mt-10 p-10 border rounded-xl " <> (if @configs["integration_type"] == "webflow", do: "block", else: "hidden")}>
+    <h3 class="absolute -top-5 left-5 bg-white px-5 py-1 pb-0 text-xl font-semibold">WebFlow Integration</h3>
+    <p class="text-sm text-gray-500 absolute top-3">This configuration is used to publish post to your WebFlow site.</p>
+
+    <form action={~p"/configs"} method="post">
+        <input name="_method" type="hidden" hidden="" value="put">
+        <input name="_csrf_token" type="hidden" hidden="" value={get_csrf_token()}>
+        <input name="integration_type" type="hidden" hidden="" value="webflow">
+
+        <div class="mt-5">
+            <label for="token" class="block text-sm font-semibold leading-6 text-zinc-800">WebFlow Token</label>
+            <input type="password" name="token" id="token" placeholder="Please enter a valid token with permission" required value={@configs["webflow"]["token"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
+        </div>
+        <div class="mt-5">
+            <div>
+                <label for="site_id" class="block text-sm font-semibold leading-6 text-zinc-800">Site ID</label>
+                <input type="text" name="site_id" id="site_id" placeholder="Your Webflow Site ID" required value={@configs["webflow"]["site_id"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
+            </div>
+        </div>
+        <div class="mt-5">
+            <div>
+                <label for="collection_id" class="block text-sm font-semibold leading-6 text-zinc-800">CMS Collections</label>
+                <select id="collection_id" name="collection_id" class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm">
+                    <option value="admin">Blog Posts</option>
+                </select>
+            </div>
+
+            <p class="text-sm text-gray-500 mt-3 block">
+                Please select the collection in which you want to publish articles on your WebFlow website.
+            </p>
+        </div>
+
+        <div class="mt-5 flex items-center justify-between gap-6">
+            <button type="submit" class="phx-submit-loading:opacity-75 rounded-lg hover:bg-zinc-700 py-2 px-5 text-sm font-semibold leading-6 text-white active:text-white/80 bg-green-600">Update</button>
+        </div>
+    </form>
+</div>
+
+<div id="form_wordpress" class={"relative mt-10 p-10 border rounded-xl " <> (if @configs["integration_type"] == "wordpress", do: "block", else: "hidden")}>
     <h3 class="absolute -top-5 left-5 bg-white px-5 py-1 pb-0 text-xl font-semibold">WordPress Application</h3>
     <p class="text-sm text-gray-500 absolute top-3">This configuration is used to publish news to your WordPress site.</p>
 
     <form action={~p"/configs"} method="post">
         <input name="_method" type="hidden" hidden="" value="put">
         <input name="_csrf_token" type="hidden" hidden="" value={get_csrf_token()}>
+        <input name="integration_type" type="hidden" hidden="" value="wordpress">
 
         <div class="mt-5">
             <label for="endpoint" class="block text-sm font-semibold leading-6 text-zinc-800">Endpoint</label>
-            <input type="text" name="endpoint" id="endpoint" placeholder="https://your-wordpress-site.com" required value={@configs["endpoint"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
+            <input type="text" name="endpoint" id="endpoint" placeholder="https://your-wordpress-site.com" required value={@configs["wordpress"]["endpoint"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
         </div>
 
         <div class="mt-5">
             <label for="username" class="block text-sm font-semibold leading-6 text-zinc-800">Username</label>
-            <input type="text" name="username" id="username" placeholder="your-username" required value={@configs["username"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
+            <input type="text" name="username" id="username" placeholder="your-username" required value={@configs["wordpress"]["username"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
         </div>
 
         <div class="mt-5">
             <label for="app_password" class="block text-sm font-semibold leading-6 text-zinc-800">Application Password</label>
-            <input type="password" name="app_password" id="app_password" placeholder="the password of wordpress application" required value={@configs["app_password"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
+            <input type="password" name="app_password" id="app_password" placeholder="the password of wordpress application" required value={@configs["wordpress"]["app_password"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
 
             <p class="text-sm text-gray-500 mt-3 block">
                 As of 5.6, WordPress has shipped with <a href="https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/" target="_blank" class="text-blue-500 hover:text-blue-700 bg-gray-100 hover:bg-gray-200 p-2 rounded font-bold underline">Application Passwords</a>, which can be generated from an Edit User page (wp-admin -> Users -> Edit User). <br>
@@ -55,3 +107,19 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.getElementById('integration_type').addEventListener('change', function () {
+        const selectedValue = this.value;
+        const formWordpress = document.getElementById('form_wordpress');
+        const formWebflow = document.getElementById('form_webflow');
+
+        if (selectedValue === 'wordpress') {
+            formWordpress.classList.remove('hidden');
+            formWebflow.classList.add('hidden');
+        } else if (selectedValue === 'webflow') {
+            formWebflow.classList.remove('hidden');
+            formWordpress.classList.add('hidden');
+        }
+    });
+</script>
