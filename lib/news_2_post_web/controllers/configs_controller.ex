@@ -29,29 +29,44 @@ defmodule News2PostWeb.ConfigsController do
 
   defp update_webflow_configs(conn, params) do
     user = conn.assigns[:current_user]
+    webflow_token = Map.get(params, "token", "")
+    webflow_site_id = Map.get(params, "site_id", "")
+    case get_webflow_collections(webflow_token, webflow_site_id) do
+      {:ok, body} ->
+        # TODO: validation
+        body = JSON.decode!(body)
+        collections = body["collections"]
+        collection_id = Map.get(params, "collection_id", List.first(collections)["id"])
 
-    webflow_configs = %{
-      "integration_type": "webflow",
-      "wordpress": %{
-        "endpoint": "",
-        "username": "",
-        "app_password": ""
-      },
-      "webflow": %{
-        "token": Map.get(params, "token", ""),
-        "site_id": Map.get(params, "site_id", ""),
-        "collection_id": ""
-      }
-    }
-    configs = JSON.encode!(webflow_configs)
-    case Accounts.update_user_configs(user, %{configs: configs}) do
-      {:ok, user} ->
+        webflow_configs = %{
+          "integration_type": "webflow",
+          "wordpress": %{
+            "endpoint": "",
+            "username": "",
+            "app_password": ""
+          },
+          "webflow": %{
+            "token": webflow_token,
+            "site_id": webflow_site_id,
+            "collections": collections,
+            "collection_id": collection_id
+          }
+        }
+        configs = JSON.encode!(webflow_configs)
+        case Accounts.update_user_configs(user, %{configs: configs}) do
+          {:ok, user} ->
+            conn
+            |> put_flash(:info, "Webflow configs updated successfully.")
+            |> redirect(to: ~p"/configs")
+          {:error, changeset} ->
+            conn
+            |> put_flash(:error, "Failed to update Webflow configs.")
+            |> redirect(to: ~p"/configs")
+        end
+      {:error, reason} ->
+        IO.inspect(reason, label: "...... error: ")
         conn
-        |> put_flash(:info, "Webflow configs updated successfully.")
-        |> redirect(to: ~p"/configs")
-      {:error, changeset} ->
-        conn
-        |> put_flash(:error, "Failed to update Webflow configs.")
+        |> put_flash(:error, "Invalid Webflow parameters!")
         |> redirect(to: ~p"/configs")
     end
   end
@@ -70,6 +85,7 @@ defmodule News2PostWeb.ConfigsController do
         "webflow": %{
           "token": "",
           "site_id": "",
+          "collections": [],
           "collection_id": ""
         }
       }
@@ -98,6 +114,26 @@ defmodule News2PostWeb.ConfigsController do
       {:ok, sanitized_endpoint}
     else
       {:error, "Endpoint must start with http."}
+    end
+  end
+
+  defp get_webflow_collections(token, site_id) do
+    url = "https://api.webflow.com/v2/sites/#{site_id}/collections"
+    headers = [
+      {"Content-Type", "application/json"},
+      {"Authorization", "Bearer #{token}"}
+    ]
+    case :hackney.request(:get, url, headers, "", [recv_timeout: 5000]) do
+      {:ok, status_code, _headers, client_ref} when status_code in 200..299 ->
+        {:ok, body} = :hackney.body(client_ref)
+        {:ok, body}
+
+      {:ok, status_code, _headers, client_ref} ->
+        {:ok, body} = :hackney.body(client_ref)
+        {:error, "Request failed with status code: #{status_code}."}
+
+      {:error, reason} ->
+        {:error, "Request failed with reason: #{reason}"}
     end
   end
 

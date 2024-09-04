@@ -47,7 +47,7 @@
 
         <div class="mt-5">
             <label for="token" class="block text-sm font-semibold leading-6 text-zinc-800">WebFlow Token</label>
-            <input type="password" name="token" id="token" placeholder="Please enter a valid token with permission" required value={@configs["webflow"]["token"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
+            <input type="text" name="token" id="token" placeholder="Please enter a valid token with permission" required value={@configs["webflow"]["token"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
         </div>
         <div class="mt-5">
             <div>
@@ -55,18 +55,24 @@
                 <input type="text" name="site_id" id="site_id" placeholder="Your Webflow Site ID" required value={@configs["webflow"]["site_id"]} class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 border-zinc-300 focus:border-zinc-400">
             </div>
         </div>
+
+        <%= if @configs["integration_type"] == "webflow" && @configs["webflow"]["collections"] != [] do %>
         <div class="mt-5">
             <div>
                 <label for="collection_id" class="block text-sm font-semibold leading-6 text-zinc-800">CMS Collections</label>
                 <select id="collection_id" name="collection_id" class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm">
-                    <option value="admin">Blog Posts</option>
+                    <%= for collection <- @configs["webflow"]["collections"] do %>
+                    <option value={"#{collection["id"]}"} selected={collection["id"] == @configs["webflow"]["collection_id"]} ><%= collection["displayName"] %></option>
+                    <% end %>
                 </select>
+
             </div>
 
             <p class="text-sm text-gray-500 mt-3 block">
                 Please select the collection in which you want to publish articles on your WebFlow website.
             </p>
         </div>
+        <% end %>
 
         <div class="mt-5 flex items-center justify-between gap-6">
             <button type="submit" class="phx-submit-loading:opacity-75 rounded-lg hover:bg-zinc-700 py-2 px-5 text-sm font-semibold leading-6 text-white active:text-white/80 bg-green-600">Update</button>

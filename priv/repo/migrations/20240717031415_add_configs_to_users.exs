@@ -3,7 +3,7 @@ defmodule News2Post.Repo.Migrations.AddConfigsToUsers do
 
   def change do
     alter table(:users) do
-      add :configs, :string, default: ""
+      add :configs, :text, default: ""
     end
   end
 end
